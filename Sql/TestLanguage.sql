@@ -1,4 +1,3 @@
-USE foMaster;
 
 # Test without database table
 SELECT setLanguage(NULL, '[LANG=UK_]Hello world.[/LANG]', NULL, 'SE_') as foLanguageColumn;

@@ -3,9 +3,11 @@
 #
 HM=`date +%H-%M`
 
-mysql -uroot -p83krypandegurkor foMaster < ../Sql/TestLanguage.sql
-mysql -uroot -p83krypandegurkor foMaster < ../Sql/TestCalc.sql
-mysql -uroot -p83krypandegurkor foMaster < ../Sql/TestValidateMinMax.sql
+mysql --execute "CREATE DATABASE foTest"
+mysql -uroot -p foTest < ../Sql/TestLanguage.sql
+mysql -uroot -p foTest < ../Sql/TestCalc.sql
+mysql -uroot -p foTest < ../Sql/TestValidateMinMax.sql
+mysql --execute "DROP DATABASE foTest"
 
-tail /var/lib/mysql/sql1.err
-echo "Finished " . HM > ../Log/TestAll.log
+tail /var/log/mysqld.log
+echo "Finished"

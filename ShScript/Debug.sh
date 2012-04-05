@@ -1,6 +1,6 @@
 # Compile REDHAT
 
-sudo gcc  -Wall -pg -O0 -fPIC -I /usr/local/mysql4/include/mysql/ -shared -lstdc++ -o ../Bin/FoLanguage.so ../FoLanguage.cpp
+sudo gcc  -Wall -pg -fPIC -I /usr/local/mysql4/include/mysql/ -shared -lstdc++ -o ../Bin/FoLanguage.so ../FoLanguage.cpp
 
 sudo /etc/init.d/mysqld4 stop
 sudo rm  /var/lib/mysql4/fo-nsg-db1.err
