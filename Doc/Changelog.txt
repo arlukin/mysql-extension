@@ -1,0 +1,24 @@
+This document includes different releases of the foLanguage.so mysql function.
+
+### 2006-08-25 ###
+* Mysql function setLanguage() will now return NULL when no language is set.
+  Before it was set to ''
+
+* Optimization, replaced some memcpy to references.
+	* 10 000 000 setLanguage+getLanguage benchmark 16.87 sec
+	* 10 000 000 setLanguage+getLanguage benchmark 16.46 sec
+	* 10 000 000 setLanguage+getLanguage benchmark 16.30 sec
+
+* Refactoring and moved lots of code from C to C++
+
+* Memory leak, lots of delete replaced with delete[].
+
+* Splitted the UDF:s into two projects
+	FoFunctions.so
+	FoLanguage.so
+
+### 2005-08-xx ###
+* Compiled on new server platform.
+
+### 2003-xx-xx ###
+* First version was created

@@ -1,3 +1,0 @@
-mysql.server stop
-cp fo_functions.so /usr/lib
-mysql.server start
