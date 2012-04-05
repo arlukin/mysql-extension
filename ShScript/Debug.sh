@@ -1,14 +1,14 @@
-# Compile SUSE
+# Compile REDHAT
 
-gcc -Wall -fPIC -I /usr/src/packages/BUILD/mysql-4.1.20/include/  -shared -lstdc++ -o ../Bin/FoFunctions.so ../FoFunctions.cpp 
-gcc -Wall -fPIC -I /usr/src/packages/BUILD/mysql-4.1.20/include/  -shared -lstdc++ -o ../Bin/FoLanguage.so ../FoLanguage.cpp 
+sudo gcc  -Wall -pg -O0 -fPIC -I /usr/local/mysql4/include/mysql/ -shared -lstdc++ -o ../Bin/FoLanguage.so ../FoLanguage.cpp
 
-/etc/init.d/mysql stop
-rm /var/lib/mysql/sql1.err
-cp ../Bin/FoFunctions.so /usr/lib64/fo_functions.so
-cp ../Bin/FoLanguage.so /usr/lib64/FoLanguage.so
-/etc/init.d/mysql start
+sudo /etc/init.d/mysqld4 stop
+sudo rm  /var/lib/mysql4/fo-nsg-db1.err
+sudo cp ../Bin/FoLanguage.so  /usr/local/mysql4/lib/mysql/FoLanguage.so
+sudo /etc/init.d/mysqld4 start
 
-mysql -uroot -p foMaster < ../Sql/Test.sql
+/usr/local/mysql4/bin/mysql --defaults-file=/usr/local/mysql4/my.cnf -udali -p foMaster < ../Sql/Testsmall.sql
 
-vi /var/lib/mysql/sql1.err 
+#sudo vi /var/lib/mysql4/fo-nsg-db1.err
+
+

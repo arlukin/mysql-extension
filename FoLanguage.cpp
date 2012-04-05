@@ -64,7 +64,7 @@
 
 	Requirments of system/OS platform.
  	---------------------------------
-	* We are assuming that a short is 2 bytes and a long is 4 bytes.
+	* We are assuming that a short is 2 bytes and a long is 8 bytes.
 
 
 	Examples
@@ -124,7 +124,7 @@ extern "C"
 #define foLDC_DEFAULTLANGUAGE	13	// Size foLDC_LANGUAGESIZE
 
 #define foLDC_HEADERSIZE			(13+foLDC_LANGUAGESIZE)
-#define foLDC_INDEXSIZE				(8+foLDC_LANGUAGESIZE)	// 2 long + languagesize
+#define foLDC_INDEXSIZE				(8+foLDC_LANGUAGESIZE)	// 8 bytes + languagesize
 #define foLDC_OPENTAGSIZE			(7+foLDC_LANGUAGESIZE)	// Number of bytes in [LANG=XX_]
 #define foLDC_CLOSETAGSIZE		7	// Number of bytes in [/LANG]
 
@@ -147,8 +147,8 @@ public:
 	unsigned short *validationCode;
 	char  *version;
 	unsigned short *numOfLanguages;
-	unsigned long   *indexPos;
-	unsigned long   *dataPos;
+	U32   *indexPos;
+	U32   *dataPos;
 	char * defaultLanguage;	// Will be the size of foLDC_DEFAULTLANGUAGE
 
 	void loadFromString(char const * const dbColumn)
@@ -156,8 +156,8 @@ public:
 		validationCode = (unsigned short*)(dbColumn+foLDC_VALIDATION);
 		version 			 = (char*)(dbColumn+foLDC_VERSION);
 		numOfLanguages = (unsigned short*)(dbColumn+foLDC_NUMOFLANGUAGE);
-		indexPos  		 = (unsigned long*)(dbColumn+foLDC_INDEXPOS);
-		dataPos 			 = (unsigned long*)(dbColumn+foLDC_DATAPOS);
+		indexPos  		 = (U32*)(dbColumn+foLDC_INDEXPOS);
+		dataPos 			 = (U32*)(dbColumn+foLDC_DATAPOS);
 		defaultLanguage= (char*)(dbColumn+foLDC_DEFAULTLANGUAGE);
 	};
 
@@ -184,16 +184,16 @@ class cfoLanguageIndex
 {
 public:
 	char *language; // Will be the size of foLDC_DEFAULTLANGUAGE
-	unsigned long *startPos;
-	unsigned long *length;
+	U32 *startPos;
+	U32 *length;
 
-	void loadFromString(char const * const dbColumn, unsigned long indexPos, unsigned long indexNumber)
+	void loadFromString(char const * const dbColumn, U32 indexPos, U32 indexNumber)
 	{
 		char const * currentIndexPos = (char*)(dbColumn+indexPos+(indexNumber*foLDC_INDEX_SIZE));
 
 		language	= (char *)(currentIndexPos+foLDC_INDEX_LANGUAGE);
-		startPos	= (unsigned long *)(currentIndexPos+foLDC_LANGUAGESIZE);
-		length		= (unsigned long *)(currentIndexPos+foLDC_INDEX_LENGTH);
+		startPos	= (U32 *)(currentIndexPos+foLDC_LANGUAGESIZE);
+		length		= (U32 *)(currentIndexPos+foLDC_INDEX_LENGTH);
 	};
 
 	//
@@ -220,8 +220,8 @@ public:
 	unsigned short languageCount;						// Number of languages
   char **language;												// The language length is foLDC_LANGUAGESIZE. 'SE_'
   char **data;
-  unsigned long *dataLengths;
-	unsigned long totalDataLength;	// Sum of the dataLengths
+  U32 *dataLengths;
+	U32 totalDataLength;	// Sum of the dataLengths
 	char defaultLanguage[foLDC_LANGUAGESIZE];
 
 	/**
@@ -235,7 +235,7 @@ public:
 		languageCount = 0;
 
 		data = new char*[allocatedLanguageCount];
-		dataLengths = new unsigned long[allocatedLanguageCount];
+		dataLengths = new U32[allocatedLanguageCount];
 		language = new char*[allocatedLanguageCount];
 		totalDataLength = 0;
 		defaultLanguage[0] = 0;	// No default language.
@@ -393,7 +393,7 @@ public:
 	*											Length of newText Example 47
 	*	@access private
 	*/
-	void parseLanguageData(char const * const newText, unsigned long length)
+	void parseLanguageData(char const * const newText, U32 length)
 	{
 		char * newTextN = new char[length+1];
 		memcpy(newTextN, newText, length);
@@ -449,7 +449,7 @@ public:
 		}
 		else
 		{
-			unsigned long dataStartPos = foLDC_HEADERSIZE+(languageCount*foLDC_INDEXSIZE);
+			U32 dataStartPos = foLDC_HEADERSIZE+(languageCount*foLDC_INDEXSIZE);
 			*length = dataStartPos+totalDataLength+(languageCount*(foLDC_OPENTAGSIZE+foLDC_CLOSETAGSIZE));
 
 			cfoString * foString = (cfoString*)initid->ptr;
@@ -462,9 +462,9 @@ public:
 			foString->modString(foLDC_VERSION, (char)1);
 			foString->modString(foLDC_NUMOFLANGUAGE, (unsigned short)languageCount);
 
-			foString->modString(foLDC_INDEXPOS, (unsigned long)foLDC_HEADERSIZE);
+			foString->modString(foLDC_INDEXPOS, (U32)foLDC_HEADERSIZE);
 
-			foString->modString(foLDC_DATAPOS, (unsigned long)dataStartPos);
+			foString->modString(foLDC_DATAPOS, (U32)dataStartPos);
 
 			//
 			// build index and data.
@@ -516,7 +516,7 @@ public:
 			debugEchoPrefix(); fprintf(stderr,	"      languageCount: %d\n", languageCount);
 
 			debugEchoPrefix(); fprintf(stderr,	"      languages\n");
-			for(unsigned long i=0;i<languageCount;i++)
+			for(int i=0;i<languageCount;i++)
 			{
 				debugEchoPrefix(); fprintf(stderr,	"        language: %s\n", language[i]);
 				debugEchoPrefix(); fprintf(stderr,	"        data: %s\n", data[i]);
@@ -543,7 +543,7 @@ private:
 	int _deleteLanguageArr(char const * const languageCode)
 	{
 		// Letar reda på den language array som ska tas bort.
-		for(unsigned long i=0;i<languageCount;i++)
+		for(int i=0;i<languageCount;i++)
 		{
 			if (strncmp(language[i], languageCode, foLDC_LANGUAGESIZE) == 0)
 			{
@@ -574,7 +574,7 @@ private:
 	*/
 	int _getLanguagePosition(char const * const languageCode)
 	{
-		for(unsigned long i=0;i<languageCount;i++)
+		for(int i=0;i<languageCount;i++)
 		{
 			if (strncmp(language[i], languageCode, foLDC_LANGUAGESIZE) == 0)
 				return i;
@@ -592,14 +592,14 @@ private:
 	void _writeLanguageData
 	(
 			cfoString * foString, int * indexWPos, int * dataWPos, int const dataStartPos,
-			char const * const language, char const * const text, unsigned long const length
+			char const * const language, char const * const text, U32 const length
 	)
 	{
 		// IndexArea - language
 		foString->modString(indexWPos, language, foLDC_LANGUAGESIZE);
 
 		// IndexArea - startPos
-		foString->modString(indexWPos, (unsigned long)(*dataWPos+foLDC_OPENTAGSIZE-dataStartPos));
+		foString->modString(indexWPos, (U32)(*dataWPos+foLDC_OPENTAGSIZE-dataStartPos));
 
 		// IndexArea - length
 		foString->modString(indexWPos, length);
@@ -619,7 +619,7 @@ private:
 		#ifdef FO_LANGUGE_DEBUG_MODE
 			debugEcho("    ------------- writeLanguageData Begin --------------");
 			debugEchoPrefix(); fprintf(stderr,	"      language %s\n",  language);
-			debugEchoPrefix(); fprintf(stderr,	"      startPos %d\n",  (unsigned long)(*dataWPos+foLDC_OPENTAGSIZE-dataStartPos));
+			debugEchoPrefix(); fprintf(stderr,	"      startPos %d\n",  (U32)(*dataWPos+foLDC_OPENTAGSIZE-dataStartPos));
 			debugEchoPrefix(); fprintf(stderr,	"      length %d\n",  length);
 			debugEchoPrefix(); fprintf(stderr,	"      text %s\n",  text);
 			debugEcho("    ------------- writeLanguageData End --------------");
@@ -647,9 +647,8 @@ private:
 */
 void createReturnString
 (
-
 		UDF_INIT * const initid, char const * const dataAreaPos,
-		unsigned long const * const textStartPos, unsigned long &textLength,
+		U32 const * const textStartPos, U32 &textLength,
 		char const * const firstLanguage, char const * const foundLanguage
 )
 {
@@ -661,7 +660,7 @@ void createReturnString
 	}
 	else
 	{
-		unsigned long orginalTextLength = textLength;
+		U32 orginalTextLength = textLength;
 
 		if (foundLanguage != NULL && textStartPos != NULL)
 			textLength += (foLDC_OPENTAGSIZE+foLDC_CLOSETAGSIZE)*2;
@@ -799,7 +798,7 @@ char *setLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
 	if (!emptyARG(args, ARG_SET_LANGUAGE_DEFAULTLANGUAGE))
 		memcpy(foLanguage.defaultLanguage, args->args[ARG_SET_LANGUAGE_DEFAULTLANGUAGE], foLDC_LANGUAGESIZE);
 
-	foLanguage.fillLanguageData(initid, (unsigned long*)length);
+	foLanguage.fillLanguageData(initid, length);
 
 	cfoString * foString = (cfoString*)initid->ptr;
 
@@ -853,6 +852,8 @@ char *setLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
 */
 my_bool getLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
 {
+	checkVariableTypeCompatiblity();		
+	
 	debugBegin(true, false);
 	debugEcho("------------- foFunction -> GetLanguage Begin --------------");
 
@@ -920,12 +921,23 @@ char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
 			if (*args->args[ARG_GET_LANGUAGE_VIEWMODE] == 1 || *args->args[ARG_GET_LANGUAGE_VIEWMODE] == 3)
 				defaultLanguage = dbColumn+foLDC_DEFAULTLANGUAGE;
 
-			// Set easier to use variables
-			unsigned long * dbColumnDataPos = (unsigned long*)(dbColumn+foLDC_DATAPOS);
-			unsigned long * dbColumnIndexPos = (unsigned long *)(dbColumn+foLDC_INDEXPOS);
+			// Debug code		
+			#ifndef FO_LANGUGE_DEBUG_MODE
+				cfoLanguageHeader oLangaugeHeader;
+				oLangaugeHeader .loadFromString(dbColumn);
+				oLangaugeHeader.debugPrint();
+				debugEchoEX("ValidationCode=", 	validationCode);
+				debugEchoEX("firstLanguage=", 	firstLanguage);
+				debugEchoEX("secondLanguage=", 	secondLanguage);
+				debugEchoEX("defaultLanguage=", 	defaultLanguage);				
+			#endif
 
-			unsigned long * textStartPos = NULL;
-			unsigned long textLength = 0;
+			// Set easier to use variables
+			U32 * dbColumnDataPos = (U32*)(dbColumn+foLDC_DATAPOS);
+			U32 * dbColumnIndexPos = (U32 *)(dbColumn+foLDC_INDEXPOS);
+
+			U32 * textStartPos = NULL;
+			U32 textLength = 0;
 			bool languageFound = false;
 			char * foundLanguagePos = NULL;
 
@@ -946,8 +958,8 @@ char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
 					// indexReadPos points to language
 					if (strncmp(indexReadPos, firstLanguage, foLDC_LANGUAGESIZE) == 0)
 					{
-						textStartPos = (unsigned long*)(indexReadPos+foLDC_LANGUAGESIZE);
-						textLength = *((unsigned long*)(indexReadPos+foLDC_LANGUAGESIZE+4));
+						textStartPos = (U32*)(indexReadPos+foLDC_LANGUAGESIZE);
+						textLength = *((U32*)(indexReadPos+foLDC_LANGUAGESIZE+4));
 						foundLanguagePos = NULL;
 						languageFound = true;
 						break;
@@ -955,8 +967,8 @@ char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
 					else if ((secondLanguage != NULL && strncmp(indexReadPos, secondLanguage, foLDC_LANGUAGESIZE) == 0) ||
 									 (defaultLanguage != NULL && languageFound == false && strncmp(indexReadPos, defaultLanguage, foLDC_LANGUAGESIZE) == 0))
 					{
-						textStartPos = (unsigned long*)(indexReadPos+foLDC_LANGUAGESIZE);
-						textLength = *((unsigned long*)(indexReadPos+foLDC_LANGUAGESIZE+4));
+						textStartPos = (U32*)(indexReadPos+foLDC_LANGUAGESIZE);
+						textLength = *((U32*)(indexReadPos+foLDC_LANGUAGESIZE+4));
 						languageFound = true;
 
 						if (*args->args[ARG_GET_LANGUAGE_VIEWMODE] == 2 || *args->args[ARG_GET_LANGUAGE_VIEWMODE] == 3)
@@ -976,8 +988,8 @@ char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
 		else
 		{
 			*length = args->lengths[ARG_GET_LANGUAGE_DBCOLUMN];
-
-			createReturnString(initid, dbColumn, 0, *length, NULL, NULL);
+			U32 textLength = *length;
+			createReturnString(initid, dbColumn, 0, textLength, NULL, NULL);
 		}
 	}
 	else

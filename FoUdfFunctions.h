@@ -29,6 +29,12 @@
 #define EC_INVALID_WEEKDAYTIME	203	// validateWeekdayStay	- mktime invalid date.
 #define EC_INVALID_UDF_ARG			204	// copyUDFARG						- Invalid udf arg.
 
+// Define variables that can vary on different OS.
+typedef unsigned char U8;
+typedef unsigned short U16;
+typedef unsigned int U32;
+typedef unsigned long U64;
+
 /**
 * Verify if an UDF argument (mysql column) is null
 * or "" (empty) like the php function empty()

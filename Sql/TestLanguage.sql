@@ -69,7 +69,9 @@ SELECT getLanguage(description, "NON", 'NON', 	2) AS empty FROM foLanguageTest;
 SELECT getLanguage(description, "NON", 'NON', 	3) AS SimpleTagFrance2 FROM foLanguageTest;
 
 # How fast is the function
-SELECT BENCHMARK(10000000,getLanguage(setLanguage('', "England", "UK", "FI"), "UK", NULL, 0)) as 6dot74;
+# NOTE: Remember to turn of debug mode in the code
+SELECT BENCHMARK(10000000,setLanguage('', "England", "UK", "FI")) as 15dot50;
+SELECT BENCHMARK(10000000,getLanguage(setLanguage('', "England", "UK", "FI"), "UK", NULL, 0)) as 18dot08;
 
 INSERT into foLanguageTest (description) values(setLanguage(NULL, "England\neng", "UK", ''));
 SELECT getLanguage(description, "UK", 'UK', 'N') as description  FROM foLanguageTest order by description;
