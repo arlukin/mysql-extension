@@ -1,7 +1,0 @@
-gcc -Wall -fPIC -I /usr/src/packages/BUILD/mysql-4.1.20/include/ -shared -lstdc++ -o udf_example.so udf_example.cc
-
-/etc/init.d/mysql stop
-cp udf_example.so /usr/lib64
-/etc/init.d/mysql start
-
-mysql -uroot -p83krypandegurkor foMaster < testudf.sql 

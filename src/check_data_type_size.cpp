@@ -4,8 +4,6 @@
 #include<stdio.h>
 int main()
 {
-
-
 	printf("int   4 = %ud\n", sizeof(int));
 	printf("long  8 = %ud\n", sizeof(long));
 	printf("char  1 = %ud\n", sizeof(char));
