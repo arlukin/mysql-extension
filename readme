@@ -1,0 +1,99 @@
+COMPILE AND INSTALL
+	1. Run ShScript/Install.sh
+	2. Copy UnitTest/FoLanguage.php to the apache/php htdocs.
+	3. Run the FoLanguage.php script.
+
+DIRECTORIES
+	!HISTORY 					- Old files not needed anymore.
+	Bin								- The compiled so files
+	DebugVisualStudio	- A Visual Studio project, that includes the main
+											files for the UDF functions, that can be used for debugging.
+	Doc								- Documentation
+	ShScript					- Scripts that can be run in the linux shell
+	Sql								- Files with sql scripts.
+	UDFExample				- UDF example provided by mysql
+	UnitTest					- Unit tests written in PHP.
+
+NOTES:
+* Both SUSE and slackware uses little endian.
+
+TODO
+* I mysql 5.1, kanske vi ska använda plugins istället för UDF?
+http://dev.mysql.com/doc/refman/5.1/en/plugin-api.html
+
+  fo Language functions
+
+	Used to save multiple translations of a text in one mysql column.
+
+	The texts are loaded from and saved to the database with two UDF functions,
+	getLanguage and setLanguage.
+
+
+	Functions
+	---------
+
+	* setLanguage
+		See description in function header.
+
+	* getLanguage
+		See description in function header.
+
+	Not yet implemented functions.
+	------------------------------
+
+	* getLanguageProperties(rule.description, 'validationcode');
+
+	* delLanguage(rule.description, $language);
+
+
+	Format of the foLanguageColumn.
+	------------------------------
+
+		The foLanguageColumn is saved in a "text" column in the mysql. The
+		format of the information is saved in the following struct.
+
+		HEADER
+		INDEX*n
+		DATA*n
+
+	* Format of header saved in a mysql column
+
+		NAME			|	SIZE	|	Description
+		-----------------------------------------------------------------------------------------
+		validationcode	|	word	|	Defines that this is a foLanguageColumn. IE: 655536.
+		version			|	byte	|	Current version of the language struct format.
+		numOfLanguage	|	word	|	Number of different languages saved in the column.
+		indexpos		|	dword	|	Position where the index are saved.
+		datapos			|	dword	|	Position where the texts are saved.
+		defaultLanguage	|	word	|	Two character representation of default language.
+
+	* Format of index saved in a mysql column repeated for each language
+	  The first language in the index part are the default language.
+
+		NAME		|	SIZE	            | Description
+		-----------------------------------------------------------------------------------------
+		language	|	foLDC_LANGUAGESIZE	| Language code represented by X number of character.
+		startpos	|	dword				| Position where the text for this language is started.
+					|						| 0 is datapos. Excluding [LANG TAG.
+		length		|	dword				| Length of the text. Excluding [LANG TAG.
+
+
+	*	Format of language data saved in the mysql column.
+
+		NAME	|	SIZE	|	Description
+		-----------------------------------------------------------------------------------------
+		data	|	blob	|	The language tag Ie [LANG=SE_]Sverige[/LANG]
+
+	Requirments of system/OS platform.
+ 	---------------------------------
+	* We are assuming that a short is 2 bytes and a long is 8 bytes.
+
+
+	Examples
+	--------
+	The file Sql/testLanguge.sql demonstrates the functionality of foLanguage. At the
+	same time as it tests that the functions works as they should on the mysql server.
+
+	Remember to set use your database ("use foMaster").
+
+***************************************************************************/

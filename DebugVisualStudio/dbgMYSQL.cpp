@@ -26,7 +26,7 @@ typedef bool my_bool;
 
 enum Item_result {STRING_RESULT,REAL_RESULT,INT_RESULT};
 
-	#include "../cfoString.h"
+	#include "../FOString.h"
 	#include "../fo_functions.h"
 	#include "../fo_calc.cpp"
 	#include "../fo_minmax.cpp"
@@ -52,7 +52,7 @@ void freeUDFARG(UDF_ARGS *args)
 {
 	for (unsigned int i = 0; i < args->arg_count; i++)
 	{
-		delete(args->args[i]);		
+		delete(args->args[i]);
 	}
 	delete args->args;
 	delete args->lengths;
@@ -63,14 +63,14 @@ void freeUDFARG(UDF_ARGS *args)
 void setUDFARG(UDF_ARGS *args, int index, char *text)
 {
 	if (text == NULL)
-	{	
+	{
 		args->args[index] = NULL;
 		args->lengths[index] = 0;
 	}
 	else
 	{
 		args->args[index] = new char[strlen(text)+1];
-		args->lengths[index] = strlen(text);	
+		args->lengths[index] = strlen(text);
 		memcpy(args->args[index], text, strlen(text));
 		args->args[index][strlen(text)] = 0;
 	}
@@ -81,15 +81,15 @@ void setUDFARG(UDF_ARGS *args, int index, char *text)
 void setUDFARG(UDF_ARGS *args, int index, char *text, int length)
 {
 	if (text == NULL)
-	{	
+	{
 		args->args[index] = NULL;
 		args->lengths[index] = 0;
 	}
 	else
 	{
 		args->args[index] = new char[length];
-		args->lengths[index] = length;	
-		memcpy(args->args[index], text, length);		
+		args->lengths[index] = length;
+		memcpy(args->args[index], text, length);
 	}
 }
 
@@ -104,7 +104,7 @@ void setUDFARG(UDF_ARGS *args, int index, int value)
 
 //
 
-void setUDFARG(UDF_ARGS *args, int index, cfoString * foString)
+void setUDFARG(UDF_ARGS *args, int index, FOString * foString)
 {
 	if (foString == NULL)
 	{
@@ -112,7 +112,7 @@ void setUDFARG(UDF_ARGS *args, int index, cfoString * foString)
 	}
 	else
 	{
-		setUDFARG(args, index, foString->getString(), foString->getLength());
+		setUDFARG(args, index, foString->get(), foString->length());
 	}
 }
 
@@ -130,8 +130,8 @@ void setUDFARGNUM(UDF_ARGS *args, int index, double value)
 //
 
 void debugValidateMinMax()
-{	
-	char *is_null = NULL; 
+{
+	char *is_null = NULL;
 	char *error = new char;
 
 	UDF_ARGS *validateArgs;
@@ -147,15 +147,15 @@ void debugValidateMinMax()
 	setUDFARG(validateArgs, ARG_MINMAX_WEEKDAYSTAYMAX,	NULL);
 	setUDFARG(validateArgs, ARG_MINMAX_WEEKDAYFROM,		"1|2|3");
 	setUDFARG(validateArgs, ARG_MINMAX_WEEKDAYTO,		NULL);
-	
+
 	validateMinMaxDate(NULL, validateArgs, is_null, error);
-}   
+}
 
 //
 
 void debugCalcPrice()
 {
-	char *is_null = NULL; 
+	char *is_null = NULL;
 	char *error = new char;
 
 	UDF_ARGS *calcpriceArgs;
@@ -164,43 +164,43 @@ void debugCalcPrice()
 	calcpriceArgs->args = new char*[ARG_PRICE_COUNT];
 	calcpriceArgs->arg_count = ARG_PRICE_COUNT;
 	calcpriceArgs->lengths = new unsigned long[ARG_PRICE_COUNT];
-	
+
 	setUDFARGNUM(calcpriceArgs, ARG_PRICE_BASEPRICE,		100);
 	setUDFARG(calcpriceArgs, ARG_PRICE_ROUTEFORMULA,	"*1");
 	setUDFARG(calcpriceArgs, ARG_PRICE_FORMULA,			"*1");
 	setUDFARG(calcpriceArgs, ARG_PRICE_TREATYFORMULA,	NULL);
-	
+
 	calcPrice(NULL, calcpriceArgs, is_null, error);
 }
 
 //
 
 
-cfoString * selectSetLanguage(cfoString * dbColumn, char * newText, char * language, char * defaultLanuage)
+FOString * selectSetLanguage(FOString * dbColumn, char * newText, char * language, char * defaultLanuage)
 {
-	char *is_null = new char; 
+	char *is_null = new char;
 	char *error = new char;
 
 	UDF_ARGS *args = createUDFARG(ARG_SET_LANGUAGE_COUNT);
-	
+
 	setUDFARG(args, ARG_SET_LANGUAGE_DBCOLUMN,				dbColumn);
 	setUDFARG(args, ARG_SET_LANGUAGE_NEWTEXT,					newText);
 	setUDFARG(args, ARG_SET_LANGUAGE_LANGUAGE,				language);
 	setUDFARG(args, ARG_SET_LANGUAGE_DEFAULTLANGUAGE,	defaultLanuage);
-	
+
 	char * result = NULL;
 	unsigned long * length = new unsigned long;
 	char *message = new char[100];
 
 	UDF_INIT *initidRet;
-	initidRet = new UDF_INIT;	
-	
+	initidRet = new UDF_INIT;
+
 	setLanguage_init(initidRet, args, message);
 	char * retString = setLanguage(initidRet, args, result, length, is_null, error);
 	setLanguage_deinit(initidRet);  // Orkar inte fixa return värdet.
 
-	cfoString *retArg = new cfoString(*length);	
-	retArg->setString(retString, *length);	
+	FOString *retArg = new FOString(*length);
+	retArg->set(retString, *length);
 
 	freeUDFARG(args);
 
@@ -210,18 +210,18 @@ cfoString * selectSetLanguage(cfoString * dbColumn, char * newText, char * langu
 
 //
 
-char * selectGetLanguage(cfoString *dbColumn, char * firstLang, char * secondLang, int viewMode)
+char * selectGetLanguage(FOString *dbColumn, char * firstLang, char * secondLang, int viewMode)
 {
-	char *is_null = new char; 
+	char *is_null = new char;
 	char *error = new char;
 
 	UDF_ARGS *args = createUDFARG(ARG_GET_LANGUAGE_COUNT);
-	
-	setUDFARG(args, ARG_GET_LANGUAGE_DBCOLUMN,				dbColumn);	
+
+	setUDFARG(args, ARG_GET_LANGUAGE_DBCOLUMN,				dbColumn);
 	setUDFARG(args, ARG_GET_LANGUAGE_FIRSTLANG,				firstLang);
 	setUDFARG(args, ARG_GET_LANGUAGE_SECONDLANG,			secondLang);
 	setUDFARG(args, ARG_GET_LANGUAGE_VIEWMODE,				viewMode);
-	
+
 	char * result = NULL;
 	unsigned long * length = new unsigned long;
 	UDF_INIT *initidRet;
@@ -247,44 +247,44 @@ char * selectGetLanguage(cfoString *dbColumn, char * firstLang, char * secondLan
 //
 
 void debugSetLanguage()
-{	
+{
 	char *	chr1;
-	cfoString *ret2b = selectSetLanguage(NULL, "[LANG=UK_]JAG ÄR EN GAMMAL KRÅKA.[/LANG]", NULL, "SE_");
-	cfoString *ret1 = selectSetLanguage(NULL,  "asdfasdf[LANG=UK_]England[/LANG]asdfasdf[LANG=FI_]Finland[/LdANG][LANG=SE_]Sverige[/LANG][LANG=FR_]Frankrike NEW[/LANG]", "", "FR_");
+	FOString *ret2b = selectSetLanguage(NULL, "[LANG=UK_]JAG ÄR EN GAMMAL KRÅKA.[/LANG]", NULL, "SE_");
+	FOString *ret1 = selectSetLanguage(NULL,  "asdfasdf[LANG=UK_]England[/LANG]asdfasdf[LANG=FI_]Finland[/LdANG][LANG=SE_]Sverige[/LANG][LANG=FR_]Frankrike NEW[/LANG]", "", "FR_");
 	//chr1 = selectGetLanguage(ret1, NULL, NULL, 0);
 
 
-	//cfoString *ret1 = selectSetLanguage(NULL,  "", "", NULL);	
+	//FOString *ret1 = selectSetLanguage(NULL,  "", "", NULL);
 
-		cfoString *ret2 = selectSetLanguage(ret1, "Daniel är en apa", "SE_", NULL);
-	cfoString *ret3 = selectSetLanguage(ret2, "Daniel är en apa2", "SE_", NULL);	
+		FOString *ret2 = selectSetLanguage(ret1, "Daniel är en apa", "SE_", NULL);
+	FOString *ret3 = selectSetLanguage(ret2, "Daniel är en apa2", "SE_", NULL);
 
-	cfoString *ret4 = selectSetLanguage(ret3, "Daniel is monkey", "UK_", "FI_");
-	cfoString *ret5 = selectSetLanguage(ret4,  "Daniel is Moimukulat", "FI_", "UK_");
-	cfoString *ret6 = selectSetLanguage(ret5,  "Daniel lé apé", "FR_", NULL);
-	cfoString *ret7 = selectSetLanguage(ret6,  "", "SE_", NULL);
-	cfoString *ret8 = selectSetLanguage(ret7,  "Vissa åldersrestriktioner finns vid vissa uthyrningstationer och i vissa fall tillkommer en kostnad för förare vilken betalas lokalt. För varje extra förare (utöver vad som är inkluderat i priset) debiteras en avgift som varierar från land till land. Övrig information kan fås vid bokninstillfället. English", "US_", NULL);
+	FOString *ret4 = selectSetLanguage(ret3, "Daniel is monkey", "UK_", "FI_");
+	FOString *ret5 = selectSetLanguage(ret4,  "Daniel is Moimukulat", "FI_", "UK_");
+	FOString *ret6 = selectSetLanguage(ret5,  "Daniel lé apé", "FR_", NULL);
+	FOString *ret7 = selectSetLanguage(ret6,  "", "SE_", NULL);
+	FOString *ret8 = selectSetLanguage(ret7,  "Vissa åldersrestriktioner finns vid vissa uthyrningstationer och i vissa fall tillkommer en kostnad för förare vilken betalas lokalt. För varje extra förare (utöver vad som är inkluderat i priset) debiteras en avgift som varierar från land till land. Övrig information kan fås vid bokninstillfället. English", "US_", NULL);
 
-	
-	
+
+
 	chr1 = selectGetLanguage(ret8, "US_", NULL, 1);
-	
+
 	chr1 = selectGetLanguage(ret8, "SE_", NULL, 0);
 	chr1 = selectGetLanguage(ret8, "SE_", NULL, 1);
 	chr1 = selectGetLanguage(ret8, "SE_", NULL, 2);
 	chr1 = selectGetLanguage(ret8, "SE_", NULL, 3);
 
-	
+
 
 	chr1 = selectGetLanguage(ret8, "US_", NULL, 0);
 
 	chr1 = selectGetLanguage(ret8, "FI_", NULL, 0);
-	chr1 = selectGetLanguage(ret8, "IS_", NULL, 0);	
-	chr1 = selectGetLanguage(ret8, "IS_", "UK_", 0);	
-	chr1 = selectGetLanguage(ret8, "IS_", "MI_", 1);	
-	chr1 = selectGetLanguage(ret8, "IS_", "MI_", 0);	
+	chr1 = selectGetLanguage(ret8, "IS_", NULL, 0);
+	chr1 = selectGetLanguage(ret8, "IS_", "UK_", 0);
+	chr1 = selectGetLanguage(ret8, "IS_", "MI_", 1);
+	chr1 = selectGetLanguage(ret8, "IS_", "MI_", 0);
 
-	
+
 	chr1 = selectGetLanguage(ret8, NULL, NULL, 0);
 	chr1 = selectGetLanguage(ret8, NULL, NULL, 1);
 	chr1 = selectGetLanguage(ret8, NULL, NULL, 2);
@@ -303,11 +303,11 @@ void debugSetLanguage()
 }
 
 int main(int argc, char* argv[])
-{	
+{
 	//debugValidateMinMax();
 	//debugCalcPrice();
 	debugSetLanguage();
-		
+
 
 
 	return 0;
