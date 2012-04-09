@@ -11,6 +11,7 @@
 # * Add the compiler marfre talked about
 # * Run unittests before installing into mysql
 # * Run "integration-tests" when installed into mysql
+# * Download unittest-cpp and place in build folder.
 
 # Where the plugin is installed
 libexecdir = /var/lib/mysql/plugins/
@@ -27,13 +28,13 @@ CFLAGS = -Wall -fPIC -lstdc++ -shared
 CTESTFLAGS = -Wall -fPIC -lstdc++ -g
 
 INCLUDE = -I /usr/include/mysql
-TESTINCLUDE = -I ./unittest-cpp/UnitTest++/src/ -I ./src/
+TESTINCLUDE = -I ./build/unittest-cpp/UnitTest++/src/ -I ./src/
 Dflags = -pg
 
 all: $(builddir)/test runtest $(builddir)/folanguage.so
 
 $(builddir)/test: $(testdir)/test.cpp $(testdir)/test_string.cpp $(srcdir)/fo_string.h
-	gcc -o $(builddir)/test $(CTESTFLAGS) $(TESTINCLUDE) ./unittest-cpp/UnitTest++/libUnitTest++.a $(testdir)/test.cpp $(testdir)/test_string.cpp
+	gcc -o $(builddir)/test $(CTESTFLAGS) $(TESTINCLUDE) ./build/unittest-cpp/UnitTest++/libUnitTest++.a $(testdir)/test.cpp $(testdir)/test_string.cpp
 
 runtest:
 	@echo ""
