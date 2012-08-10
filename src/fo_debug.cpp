@@ -14,42 +14,39 @@
 
 
 // Enable/Disable debug mode!
-//#define FO_LANGUGE_DEBUG_MODE
+// #define FO_LANGUGE_DEBUG_MODE
 
 #ifndef FO_LANGUGE_DEBUG_MODE
-
-	#define debugBegin(level1, level2)
-	#define debugEchoPrefix()
-	#define debugEcho(text)
-	#define debugEchoEX(text, value)
-	#define debugPrintString(dbColumn, length)
-	#define debugCheckVariableTypeSize()
+	#define debug_begin(level1, level2)
+	#define debug_echo_prefix()
+	#define debug_echo(text)
+	#define debug_echo_ex(text, value)
+	#define debug_print_string(dbColumn, length)
 
 #else
 	//
-	// Those global variables may cause some errors.
-	// Becuase the mysql module needs to be build
-	// thread safe, with no global variables.
+	// These global variables may cause some errors. Becuase the mysql module
+	// needs to be build thread safe, with no global variables.
 	//
 	// But it looks to work for singel user mode.
 	//
 	int debugCounter1 = 0;
 	int debugCounter2 = 0;
 
-	#define debugBegin(level1, level2) _debugBegin(level1, level2)
-	#define debugEchoPrefix() _debugEchoPrefix(__FILE__, __LINE__)
-	#define debugEcho(text) _debugEcho(__FILE__, __LINE__, text)
-    #define debugEchoEX(text, value) _debugEcho(__FILE__, __LINE__, text, value)
-	#define debugPrintString(dbColumn, length) _debugPrintString(__FILE__, __LINE__, dbColumn, length)
-	#define debugCheckVariableTypeSize() _debugCheckVariableTypeSize()
+	#define debug_begin(level1, level2) _debug_begin(level1, level2)
+	#define debug_echo_prefix() _debug_echo_prefix(__FILE__, __LINE__)
+	#define debug_echo(text) _debug_echo(__FILE__, __LINE__, text)
+    #define debug_echo_ex(text, value) _debug_echo(__FILE__, __LINE__, text, value)
+	#define debug_print_string(dbColumn, length) _debug_print_string(__FILE__, __LINE__, dbColumn, length)
+
 
 	/**
-	* Handles prefix counter for _debugEchoPrefix, used
-	* for grouping many debugEcho() output to one section.
+	* Handles prefix counter for _debug_echo_prefix, used
+	* for grouping many debug_echo() output to one section.
 	*
 	*	@access public
 	*/
-	void _debugBegin(bool level1 = true, bool level2=false)
+	void _debug_begin(bool level1 = true, bool level2=false)
 	{
 		if (level1)
 		{
@@ -63,73 +60,81 @@
 		}
 	}
 
+
 	/**
 	* Writes the debug prefix to the mysql error file.
-	* Should be used with fprintf(stderr, ...) to get the right
-	* format on the stderr output.
-	*
-	*	@access public
 	*/
-	void _debugEchoPrefix(char * file, int line)
+	void _debug_echo_prefix(char * file, int line)
 	{
 		fprintf(stderr, "%d-%d (%s - %d) ", debugCounter1, debugCounter2,  file, line);
 	}
 
+
 	/**
 	* Writes a text to the mysql error file, with a prefix.
-	*
-	*
-	*	@access public
 	*/
-	void _debugEcho(char * file, int line, char const * const text)
+	void _debug_echo(char * file, int line, char const * const text)
 	{
-		_debugEchoPrefix(file, line);
+		_debug_echo_prefix(file, line);
 		fprintf(stderr, "%s\n", text);
 	}
 
-	void _debugEcho(char * file, int line, char const * const text, unsigned short *value)
+
+	void _debug_echo(char * file, int line, char const * const text, unsigned short *value)
 	{
-		_debugEchoPrefix(file, line);
+		_debug_echo_prefix(file, line);
 		fprintf(stderr, "%s%u\n", text, *value);
 	}
 
-	void _debugEcho(char * file, int line, char const * const text, char *value)
+
+	void _debug_echo(char * file, int line, char const * const text, char *value)
 	{
-		_debugEchoPrefix(file, line);
+		_debug_echo_prefix(file, line);
 		fprintf(stderr, "%s%s\n", text, value);
 	}
 
-	void _debugEcho(char * file, int line, char const * const text, long unsigned int value)
+
+	void _debug_echo
+	(
+		char * file,
+		int line,
+		char const * const text,
+		long unsigned int value
+	)
 	{
-		_debugEchoPrefix(file, line);
+		_debug_echo_prefix(file, line);
 		fprintf(stderr, "%s%ld\n", text, value);
 	}
+
+
 	/**
 	* Writes what's in the dbColumn string, character by character,
 	* both with charachter, number and memory adress.
-	*
-	*	@access public
 	*/
-
-	void _debugPrintString(char * file, int line, char const * const dbColumn, int length)
+	void _debug_print_string
+	(
+		char * file, int line,
+		char const * const dbColumn,
+		int length
+	)
 	{
 		unsigned char * bytePos;
 		unsigned short * shortPos;
 		unsigned int * intPos;
-			fprintf
-			(
-				stderr,
-				"bytePos(%lu)\n",
-				sizeof(bytePos)
-			);
+		fprintf
+		(
+			stderr,
+			"bytePos(%lu)\n",
+			sizeof(bytePos)
+		);
 
-		_debugEcho(file, line,"---------- foFunction - Debug string -------------");
+		_debug_echo(file, line,"---------- foFunction - Debug string --------");
 		for (unsigned short i=0; i<length ;i++)
 		{
 			bytePos = (unsigned char*)(dbColumn+i);
 			shortPos = (unsigned short*)(dbColumn+i);
 			intPos = (unsigned int*)(dbColumn+i);
-			_debugEchoPrefix(file, line);
+			_debug_echo_prefix(file, line);
 			fprintf
 			(
 				stderr,
@@ -142,26 +147,14 @@
 				*bytePos
 			);
 		}
-		_debugEcho(file, line,"--------------------------------------------------");
+		_debug_echo(file, line,"---------------------------------------------");
 	}
 
-	void _debugCheckVariableTypeSize()
-	{
-		debugEcho("---- Size of variables ----");
-		debugEchoEX("int   4 = ", sizeof(int));
-		debugEchoEX("long  8 = ", sizeof(long));
-		debugEchoEX("char  1 = ", sizeof(char));
-		debugEchoEX("short 2 = ", sizeof(short));
-
-		debugEchoEX("u int = ", sizeof(unsigned int));
-		debugEchoEX("u long = ", sizeof(unsigned long));
-		debugEchoEX("u char= ", sizeof(unsigned char));
-		debugEchoEX("u short = ", sizeof(unsigned short));
-	}
 
 #endif
 
-void checkVariableTypeCompatiblity()
+
+void check_variable_type_compatiblity()
 {
 	if
 	(

@@ -1,4 +1,3 @@
-
 //
 // Includes to build a mysql UDF.
 //
@@ -23,17 +22,19 @@
 #include "fo_debug.cpp"
 #include "fo_language.hpp"
 
-void cfoLanguageHeader::loadFromString(char const * const dbColumn)
+
+void cfoLanguageHeader::load_from_string(char const * const dbColumn)
 {
 	validationCode  = (unsigned short*)(dbColumn+foLDC_VALIDATION);
 	version 	    = (char*)(dbColumn+foLDC_VERSION);
 	numOfLanguages  = (unsigned short*)(dbColumn+foLDC_NUMOFLANGUAGE);
 	indexPos  	    = (U32*)(dbColumn+foLDC_INDEXPOS);
 	dataPos 	    = (U32*)(dbColumn+foLDC_DATAPOS);
-	defaultLanguage = (char*)(dbColumn+foLDC_DEFAULTLANGUAGE);
+	default_language = (char*)(dbColumn+foLDC_default_language);
 };
 
-void cfoLanguageHeader::debugPrint()
+
+void cfoLanguageHeader::debug_print()
 {
 	#ifdef FO_LANGUGE_DEBUG_MODE
 		debugEcho("    ---------- Header Begin -------------");
@@ -42,12 +43,13 @@ void cfoLanguageHeader::debugPrint()
 		debugEchoPrefix(); fprintf(stderr,	"      numOfLanguages %d\n",  *numOfLanguages);
 		debugEchoPrefix(); fprintf(stderr,	"      indexPos %d\n", 			  *indexPos);
 		debugEchoPrefix(); fprintf(stderr,	"      dataPos %d\n", 			  *dataPos);
-		debugEchoPrefix(); fprintf(stderr,	"      defaultLanguage %s\n", defaultLanguage);
+		debugEchoPrefix(); fprintf(stderr,	"      default_language %s\n", default_language);
 		debugEcho("    ---------- Header End -------------");
 	#endif
 }
 
-void cfoLanguageIndex::loadFromString(char const * const dbColumn, U32 indexPos, U32 indexNumber)
+
+void cfoLanguageIndex::load_from_string(char const * const dbColumn, U32 indexPos, U32 indexNumber)
 {
 	char const * currentIndexPos = (char*)(dbColumn+indexPos+(indexNumber*foLDC_INDEX_SIZE));
 
@@ -56,7 +58,8 @@ void cfoLanguageIndex::loadFromString(char const * const dbColumn, U32 indexPos,
 	length	 = (U32 *)(currentIndexPos+foLDC_INDEX_LENGTH);
 };
 
-void cfoLanguageIndex::debugPrint()
+
+void cfoLanguageIndex::debug_print()
 {
 	#ifdef FO_LANGUGE_DEBUG_MODE
 		debugEcho("    ---------- Index Begin -------------");
@@ -67,6 +70,7 @@ void cfoLanguageIndex::debugPrint()
 	#endif
 }
 
+
 cfoLanguage::cfoLanguage()
 {
 	allocatedLanguageCount = 100;	// Number of languages to allocate space for.
@@ -76,8 +80,9 @@ cfoLanguage::cfoLanguage()
 	dataLengths = new U32[allocatedLanguageCount];
 	language = new char*[allocatedLanguageCount];
 	totalDataLength = 0;
-	defaultLanguage[0] = 0;	// No default language.
+	default_language[0] = 0;	// No default language.
 }
+
 
 cfoLanguage::~cfoLanguage()
 {
@@ -94,18 +99,19 @@ cfoLanguage::~cfoLanguage()
 	delete[] dataLengths;
 	delete[] language;
 	totalDataLength = 0;
-	defaultLanguage[0] = 0;
+	default_language[0] = 0;
 }
 
-void cfoLanguage::loadLanguageData(char const * const dbColumn)
+
+void cfoLanguage::load_language_data(char const * const dbColumn)
 {
-	debugEcho("  ------------- loadLanguageData Begin --------------");
-	debugPrint();
+	debugEcho("  ------------- load_language_data Begin --------------");
+	debug_print();
 
 	//
 	cfoLanguageHeader headerData;
-	headerData.loadFromString(dbColumn);
-	headerData.debugPrint();
+	headerData.load_from_string(dbColumn);
+	headerData.debug_print();
 
 	// validationCode
 	if (*headerData.validationCode == foLDC_VALIDATE_CODE)
@@ -115,19 +121,19 @@ void cfoLanguage::loadLanguageData(char const * const dbColumn)
 		{
 			if (languageCount+*headerData.numOfLanguages <= allocatedLanguageCount)
 			{
-				// DefaultLanguage
-				memcpy(defaultLanguage, headerData.defaultLanguage, foLDC_LANGUAGESIZE);
+				// default_language
+				memcpy(default_language, headerData.default_language, foLDC_LANGUAGESIZE);
 
 				cfoLanguageIndex indexData;
 				for (int i=0;i<*headerData.numOfLanguages;i++)
 				{
-					indexData.loadFromString(dbColumn, *headerData.indexPos, i);
-					indexData.debugPrint();
+					indexData.load_from_string(dbColumn, *headerData.indexPos, i);
+					indexData.debug_print();
 
 					// dbColumn is the full database column in a string.
 					// dataPos is where the position where the string data section begins.
 					// indexdata.startPos is the pos where the language string begings in the data section.
-					setLanguageArr
+					set_language_arr
 					(
 						indexData.language,
 						(char *)(dbColumn+*headerData.dataPos+*indexData.startPos),
@@ -140,7 +146,7 @@ void cfoLanguage::loadLanguageData(char const * const dbColumn)
 				fprintf
 				(
 					stderr,
-					"Error: foFunction-fo_language-loadLanguageData Too many languages to allocate, current %d, max %d\n",
+					"Error: foFunction-fo_language-load_language_data Too many languages to allocate, current %d, max %d\n",
 					languageCount+*headerData.numOfLanguages,
 					allocatedLanguageCount
 				);
@@ -148,21 +154,22 @@ void cfoLanguage::loadLanguageData(char const * const dbColumn)
 		}
 	}
 
-	debugEcho("  ------------- loadLanguageData End --------------");
+	debugEcho("  ------------- load_language_data End --------------");
 }
 
-void cfoLanguage::setLanguageArr(char const * const languageCode, char const * const text, int const length)
+
+void cfoLanguage::set_language_arr(char const * const languageCode, char const * const text, int const length)
 {
 	// First delete if any earlier language exist,
 	// and then replace that array position.
-	_deleteLanguageArr(languageCode);
+	_delete_language_arr(languageCode);
 
 	if (languageCount >= allocatedLanguageCount)
 	{
 		fprintf
 		(
 			stderr,
-			"Error: foFunction-fo_language-setLanguageArr Too many languages allocated, current %d, max %d\n",
+			"Error: foFunction-fo_language-set_language_arr Too many languages allocated, current %d, max %d\n",
 			languageCount,
 			allocatedLanguageCount
 		);
@@ -190,7 +197,8 @@ void cfoLanguage::setLanguageArr(char const * const languageCode, char const * c
 	}
 }
 
-void cfoLanguage::parseLanguageData(char const * const newText, U32 length)
+
+void cfoLanguage::parse_language_data(char const * const newText, U32 length)
 {
 	char * newTextN = new char[length+1];
 	memcpy(newTextN, newText, length);
@@ -223,17 +231,18 @@ void cfoLanguage::parseLanguageData(char const * const newText, U32 length)
 		// in this string "[lang=de_]text[lang=se_]text[/lang]". se is however valid for parsing.
 		if (openTagPos == NULL || (closeTagPos != NULL && closeTagPos < openTagPos))
 		{
-			setLanguageArr(language, newTextNRead, closeTagPos-newTextNRead);
+			set_language_arr(language, newTextNRead, closeTagPos-newTextNRead);
 		}
 	}
 
 	delete[] newTextN;
 }
 
-void cfoLanguage::fillLanguageData(void *str_ptr, unsigned long *length)
+
+void cfoLanguage::fill_language_data(void *str_ptr, unsigned long *length)
 {
-	debugEcho("  ------------- fillLanguageData Begin --------------");
-	debugPrint();
+	debugEcho("  ------------- fill_language_data Begin --------------");
+	debug_print();
 
 	if (languageCount == 0)
 	{
@@ -265,38 +274,39 @@ void cfoLanguage::fillLanguageData(void *str_ptr, unsigned long *length)
 		int dataWPos = dataStartPos;
 		int langPos = -1;
 
-		if (defaultLanguage[0] != 0)
+		if (default_language[0] != 0)
 		{
-			langPos = _getLanguagePosition(defaultLanguage);
+			langPos = _get_language_position(default_language);
 
 			// Language didnt exist.
 			if (langPos == -1)
-				defaultLanguage[0] = 0;
+				default_language[0] = 0;
 			else
-				_writeLanguageData(foString, &indexWPos, &dataWPos, dataStartPos, defaultLanguage, data[langPos], dataLengths[langPos]);
+				_write_language_data(foString, &indexWPos, &dataWPos, dataStartPos, default_language, data[langPos], dataLengths[langPos]);
 		}
 
 		for(int i=0;i<languageCount;i++)
 		{
 			if (langPos != i)
 			{
-				_writeLanguageData(foString, &indexWPos, &dataWPos, dataStartPos,  language[i], data[i], dataLengths[i]);
+				_write_language_data(foString, &indexWPos, &dataWPos, dataStartPos,  language[i], data[i], dataLengths[i]);
 
 				// If no default language are set by the user,
 				// use the first language in the foLanguage index as default language.
-				if (defaultLanguage[0] == 0)
-					memcpy(defaultLanguage, language[i], foLDC_LANGUAGESIZE);
+				if (default_language[0] == 0)
+					memcpy(default_language, language[i], foLDC_LANGUAGESIZE);
 			}
 		}
 
-		// defaultLanguage
-		foString->overwrite(foLDC_DEFAULTLANGUAGE, defaultLanguage, foLDC_LANGUAGESIZE);
+		// default_language
+		foString->overwrite(foLDC_default_language, default_language, foLDC_LANGUAGESIZE);
 	}
 
-	debugEcho("  ------------- fillLanguageData End --------------");
+	debugEcho("  ------------- fill_language_data End --------------");
 }
 
-void cfoLanguage::debugPrint()
+
+void cfoLanguage::debug_print()
 {
 	#ifdef FO_LANGUGE_DEBUG_MODE
 		debugEcho("    ---------- foLanguage Begin -------------");
@@ -313,13 +323,14 @@ void cfoLanguage::debugPrint()
 		}
 		debugEchoPrefix(); fprintf(stderr,	"      totalDataLength: %d\n", totalDataLength);
 
-		debugEchoPrefix(); fprintf(stderr,	"      defaultLanguage: %s\n", defaultLanguage);
+		debugEchoPrefix(); fprintf(stderr,	"      default_language: %s\n", default_language);
 
 		debugEcho("    ---------- foLanguage End -------------");
 	#endif
 }
 
-int cfoLanguage::_deleteLanguageArr(char const * const languageCode)
+
+int cfoLanguage::_delete_language_arr(char const * const languageCode)
 {
 	// Letar reda på den language array som ska tas bort.
 	for(int i=0;i<languageCount;i++)
@@ -346,7 +357,8 @@ int cfoLanguage::_deleteLanguageArr(char const * const languageCode)
 	return -1;
 }
 
-int cfoLanguage::_getLanguagePosition(char const * const languageCode)
+
+int cfoLanguage::_get_language_position(char const * const languageCode)
 {
 	for(int i=0;i<languageCount;i++)
 	{
@@ -357,7 +369,8 @@ int cfoLanguage::_getLanguagePosition(char const * const languageCode)
 	return -1;
 }
 
-void cfoLanguage::_writeLanguageData
+
+void cfoLanguage::_write_language_data
 (
 		FOString * foString, int * indexWPos, int * dataWPos, int const dataStartPos,
 		char const * const language, char const * const text, U32 const length

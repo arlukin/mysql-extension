@@ -65,7 +65,7 @@ http://dev.mysql.com/doc/refman/5.1/en/plugin-api.html
 		numOfLanguage	|	word	|	Number of different languages saved in the column.
 		indexpos		|	dword	|	Position where the index are saved.
 		datapos			|	dword	|	Position where the texts are saved.
-		defaultLanguage	|	word	|	Two character representation of default language.
+		default_language	|	word	|	Two character representation of default language.
 
 	* Format of index saved in a mysql column repeated for each language
 	  The first language in the index part are the default language.

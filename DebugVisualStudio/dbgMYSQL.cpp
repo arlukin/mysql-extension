@@ -186,7 +186,7 @@ FOString * selectSetLanguage(FOString * dbColumn, char * newText, char * languag
 	setUDFARG(args, ARG_SET_LANGUAGE_DBCOLUMN,				dbColumn);
 	setUDFARG(args, ARG_SET_LANGUAGE_NEWTEXT,					newText);
 	setUDFARG(args, ARG_SET_LANGUAGE_LANGUAGE,				language);
-	setUDFARG(args, ARG_SET_LANGUAGE_DEFAULTLANGUAGE,	defaultLanuage);
+	setUDFARG(args, ARG_SET_LANGUAGE_default_language,	defaultLanuage);
 
 	char * result = NULL;
 	unsigned long * length = new unsigned long;

@@ -1,16 +1,8 @@
 #ifndef FO_UDF_H
 #define FO_UDF_H
 
-//ERRORCODELIST
-//0     Resan är godkänd
-#define EC_SUCCESS 0
-#define EC_VALID_MIN_SECTION 1          // validateMinMaxDate
-
-//2xx System felsmedelande, kan bero på fel indata.
-#define EC_INVALID_UDF_ARG          204 // copyUDFARG - Invalid udf arg.
-
 //
-// Used by mysld to find the symbbol in the .so file.
+// Used by mysqld to find the symbol table in the .so file.
 //
 extern "C"
 {
