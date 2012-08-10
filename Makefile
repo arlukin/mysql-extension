@@ -33,8 +33,8 @@ Dflags = -pg
 
 all: $(builddir)/test runtest $(builddir)/folanguage.so
 
-$(builddir)/test: $(testdir)/test.cpp $(testdir)/test_string.cpp $(srcdir)/fo_string.h
-	gcc -o $(builddir)/test $(CTESTFLAGS) $(TESTINCLUDE) ./build/unittest-cpp/UnitTest++/libUnitTest++.a $(testdir)/test.cpp $(testdir)/test_string.cpp
+$(builddir)/test: $(testdir)/test.cpp $(testdir)/test_string.cpp $(testdir)/test_data_type_size.cpp $(srcdir)/fo_string.h
+	gcc -o $(builddir)/test $(CTESTFLAGS) $(TESTINCLUDE) ./build/unittest-cpp/UnitTest++/libUnitTest++.a $(testdir)/test.cpp $(testdir)/test_string.cpp $(testdir)/test_data_type_size.cpp
 
 runtest:
 	@echo ""
