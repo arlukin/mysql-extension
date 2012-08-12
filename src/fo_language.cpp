@@ -37,14 +37,14 @@ void cfoLanguageHeader::load_from_string(char const * const dbColumn)
 void cfoLanguageHeader::debug_print()
 {
 	#ifdef FO_LANGUGE_DEBUG_MODE
-		debugEcho("    ---------- Header Begin -------------");
-		debugEchoPrefix(); fprintf(stderr,	"      validationCode %d\n",  *validationCode);
-		debugEchoPrefix(); fprintf(stderr,	"      version %d\n", 			  *version);
-		debugEchoPrefix(); fprintf(stderr,	"      numOfLanguages %d\n",  *numOfLanguages);
-		debugEchoPrefix(); fprintf(stderr,	"      indexPos %d\n", 			  *indexPos);
-		debugEchoPrefix(); fprintf(stderr,	"      dataPos %d\n", 			  *dataPos);
-		debugEchoPrefix(); fprintf(stderr,	"      default_language %s\n", default_language);
-		debugEcho("    ---------- Header End -------------");
+		debug_echo("    ---------- Header Begin -------------");
+		debug_echo_prefix(); fprintf(stderr,	"      validationCode %d\n",  *validationCode);
+		debug_echo_prefix(); fprintf(stderr,	"      version %d\n", 			  *version);
+		debug_echo_prefix(); fprintf(stderr,	"      numOfLanguages %d\n",  *numOfLanguages);
+		debug_echo_prefix(); fprintf(stderr,	"      indexPos %d\n", 			  *indexPos);
+		debug_echo_prefix(); fprintf(stderr,	"      dataPos %d\n", 			  *dataPos);
+		debug_echo_prefix(); fprintf(stderr,	"      default_language %s\n", default_language);
+		debug_echo("    ---------- Header End -------------");
 	#endif
 }
 
@@ -62,11 +62,11 @@ void cfoLanguageIndex::load_from_string(char const * const dbColumn, U32 indexPo
 void cfoLanguageIndex::debug_print()
 {
 	#ifdef FO_LANGUGE_DEBUG_MODE
-		debugEcho("    ---------- Index Begin -------------");
-		debugEchoPrefix(); fprintf(stderr,	"      language %s\n", language);
-		debugEchoPrefix(); fprintf(stderr,	"      startPos %d\n", *startPos);
-		debugEchoPrefix(); fprintf(stderr,	"      length %d\n",   *length);
-		debugEcho("    ---------- Index end -------------");
+		debug_echo("    ---------- Index Begin -------------");
+		debug_echo_prefix(); fprintf(stderr,	"      language %s\n", language);
+		debug_echo_prefix(); fprintf(stderr,	"      startPos %d\n", *startPos);
+		debug_echo_prefix(); fprintf(stderr,	"      length %d\n",   *length);
+		debug_echo("    ---------- Index end -------------");
 	#endif
 }
 
@@ -105,7 +105,7 @@ cfoLanguage::~cfoLanguage()
 
 void cfoLanguage::load_language_data(char const * const dbColumn)
 {
-	debugEcho("  ------------- load_language_data Begin --------------");
+	debug_echo("  ------------- load_language_data Begin --------------");
 	debug_print();
 
 	//
@@ -154,7 +154,7 @@ void cfoLanguage::load_language_data(char const * const dbColumn)
 		}
 	}
 
-	debugEcho("  ------------- load_language_data End --------------");
+	debug_echo("  ------------- load_language_data End --------------");
 }
 
 
@@ -241,7 +241,7 @@ void cfoLanguage::parse_language_data(char const * const newText, U32 length)
 
 void cfoLanguage::fill_language_data(void *str_ptr, unsigned long *length)
 {
-	debugEcho("  ------------- fill_language_data Begin --------------");
+	debug_echo("  ------------- fill_language_data Begin --------------");
 	debug_print();
 
 	if (languageCount == 0)
@@ -302,30 +302,30 @@ void cfoLanguage::fill_language_data(void *str_ptr, unsigned long *length)
 		foString->overwrite(foLDC_default_language, default_language, foLDC_LANGUAGESIZE);
 	}
 
-	debugEcho("  ------------- fill_language_data End --------------");
+	debug_echo("  ------------- fill_language_data End --------------");
 }
 
 
 void cfoLanguage::debug_print()
 {
 	#ifdef FO_LANGUGE_DEBUG_MODE
-		debugEcho("    ---------- foLanguage Begin -------------");
-		debugEchoPrefix(); fprintf(stderr,	"      allocatedLanguageCount: %d\n", allocatedLanguageCount);
-		debugEchoPrefix(); fprintf(stderr,	"      languageCount: %d\n", languageCount);
+		debug_echo("    ---------- foLanguage Begin -------------");
+		debug_echo_prefix(); fprintf(stderr,	"      allocatedLanguageCount: %d\n", allocatedLanguageCount);
+		debug_echo_prefix(); fprintf(stderr,	"      languageCount: %d\n", languageCount);
 
-		debugEchoPrefix(); fprintf(stderr,	"      languages\n");
+		debug_echo_prefix(); fprintf(stderr,	"      languages\n");
 		for(int i=0;i<languageCount;i++)
 		{
-			debugEchoPrefix(); fprintf(stderr,	"        language: %s\n", language[i]);
-			debugEchoPrefix(); fprintf(stderr,	"        data: %s\n", data[i]);
-			debugEchoPrefix(); fprintf(stderr,	"        dataLengths: %d\n", dataLengths[i]);
-			debugEcho("");
+			debug_echo_prefix(); fprintf(stderr,	"        language: %s\n", language[i]);
+			debug_echo_prefix(); fprintf(stderr,	"        data: %s\n", data[i]);
+			debug_echo_prefix(); fprintf(stderr,	"        dataLengths: %d\n", dataLengths[i]);
+			debug_echo("");
 		}
-		debugEchoPrefix(); fprintf(stderr,	"      totalDataLength: %d\n", totalDataLength);
+		debug_echo_prefix(); fprintf(stderr,	"      totalDataLength: %d\n", totalDataLength);
 
-		debugEchoPrefix(); fprintf(stderr,	"      default_language: %s\n", default_language);
+		debug_echo_prefix(); fprintf(stderr,	"      default_language: %s\n", default_language);
 
-		debugEcho("    ---------- foLanguage End -------------");
+		debug_echo("    ---------- foLanguage End -------------");
 	#endif
 }
 
@@ -398,11 +398,11 @@ void cfoLanguage::_write_language_data
 
 	// Debug information
 	#ifdef FO_LANGUGE_DEBUG_MODE
-		debugEcho("    ------------- writeLanguageData Begin --------------");
-		debugEchoPrefix(); fprintf(stderr,	"      language %s\n",  language);
-		debugEchoPrefix(); fprintf(stderr,	"      startPos %d\n",  (U32)(*dataWPos+foLDC_OPENTAGSIZE-dataStartPos));
-		debugEchoPrefix(); fprintf(stderr,	"      length %d\n",  length);
-		debugEchoPrefix(); fprintf(stderr,	"      text %s\n",  text);
-		debugEcho("    ------------- writeLanguageData End --------------");
+		debug_echo("    ------------- writeLanguageData Begin --------------");
+		debug_echo_prefix(); fprintf(stderr,	"      language %s\n",  language);
+		debug_echo_prefix(); fprintf(stderr,	"      startPos %d\n",  (U32)(*dataWPos+foLDC_OPENTAGSIZE-dataStartPos));
+		debug_echo_prefix(); fprintf(stderr,	"      length %d\n",  length);
+		debug_echo_prefix(); fprintf(stderr,	"      text %s\n",  text);
+		debug_echo("    ------------- writeLanguageData End --------------");
 	#endif
 }
