@@ -4,6 +4,8 @@
 //
 /////////////////////////////////////////////////////////
 
+include <udf.hpp>
+
 /**
 * Verify if an UDF argument (mysql column) is null or "" (empty).
 *
@@ -26,35 +28,6 @@ inline bool empty_arg(const UDF_ARGS * const args, const int index)
 //
 /////////////////////////////////////////////////////////
 
-/**
-* char* = setLanguage(dbColumn, newText, language, default_language)
-*
-* Concatenates a foLanguageColumn with a new language.
-*
-* Argument format
-*     [0]dbColumn         - "[LANGINDEX][LANG=SE]Hej världen[/LANG][LANG=UK]Hello world[/LANG]"
-*                           Can be null
-*     [1]newText          - "Moi mukulat"
-*                           Can be null, will delete the language indicated by [2]language.
-*     [2]language         - "FI"
-*                           If null, the [1]newText field must include the [LANG=xx] tag.
-*     [3]default_language  - "UK" can be null
-*
-* Return
-*     The concated string with the index.
-*     [...LANGINDEX....][LANG=UK]Hello world[/LANG][LANG=SE]Hej världen[/LANG][LANG=FI]Moi mukulat[/LANG]
-*
-* Example
-*     select setLanguage(NULL, "Moi mukulat]", "FI", "UK") as description;
-*
-*/
-#define ARG_SET_LANGUAGE_DBCOLUMN        0
-#define ARG_SET_LANGUAGE_NEWTEXT         1
-#define ARG_SET_LANGUAGE_LANGUAGE        2
-#define ARG_SET_LANGUAGE_default_language 3
-
-#define ARG_SET_LANGUAGE_COUNT  4
-
 
 /**
 *
@@ -62,8 +35,8 @@ inline bool empty_arg(const UDF_ARGS * const args, const int index)
 */
 my_bool setLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
 {
-    debugBegin(true, false);
-    debugEcho("------------- foFunction -> SetLanguage Begin --------------");
+    debug_begin(true, false);
+    debug_echo("------------- foFunction -> SetLanguage Begin --------------");
 
     if (args->arg_count < ARG_SET_LANGUAGE_COUNT)
     {
@@ -95,7 +68,7 @@ my_bool setLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
 void setLanguage_deinit(UDF_INIT *initid)
 {
     delete (FOString*)initid->ptr;
-    debugEcho("------------- foFunction -> SetLanguage End --------------");
+    debug_echo("------------- foFunction -> SetLanguage End --------------");
 }
 
 
@@ -105,7 +78,7 @@ void setLanguage_deinit(UDF_INIT *initid)
 */
 char *setLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error)
 {
-    debugBegin(false, true);
+    debug_begin(false, true);
     cfoLanguage foLanguage;
 
     // Load the current language information, to add new language data to.
@@ -164,46 +137,13 @@ char *setLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
 
 
 /**
-* text = getLanguage(dbColumn, firstLang, secondLang, viewMode);
-*
-* Get a language from a foLanguageColumn.
-* Argument format
-*     [0]dbColumn   - "[LANGINDEX][LANG=SE]Hej världen[/LANG][LANG=UK]Hello world[/LANG]"
-*                     Can be null.
-*     [1]firstLang  - "SE"  Look for this lang first.
-*                     If null, return all the languages with tags.
-*     [2]secondLang - "FI"  If not firstLang are found, try to find this.
-*                     Can be null, won't search for this lang if null
-*     [3]viewMode   - 0 - Only firstLang and secondLang
-*                     1 - If none of the above are found and this is true
-*                         look for the first langouage in the foLanguageColumn.
-*                         return NULL if false.
-*                     2 - Like mode 0, but if only secondLang is found return
-*                         with tags [LANG=SE][/LANG][LANG=UK]English[/LANG]
-*                     3 - Like mode 1, but if onlye secondLang or defaultLang
-*                         is found return with tags.
-* Return
-*     The wanted string, or with tags ie. [LANG=SE]COW[/LANG]
-*
-* Example
-*     select setLanguage(rule.rule_name, "FI", "UK", 1) as rule_name;
-*/
-#define ARG_GET_LANGUAGE_DBCOLUMN   0
-#define ARG_GET_LANGUAGE_FIRSTLANG  1
-#define ARG_GET_LANGUAGE_SECONDLANG 2
-#define ARG_GET_LANGUAGE_VIEWMODE   3
-
-#define ARG_GET_LANGUAGE_COUNT  4
-
-
-/**
 *
 * @access public
 */
 my_bool getLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
 {
-    debugBegin(true, false);
-    debugEcho("------------- foFunction -> GetLanguage Begin --------------");
+    debug_begin(true, false);
+    debug_echo("------------- foFunction -> GetLanguage Begin --------------");
 
     if (args->arg_count < ARG_GET_LANGUAGE_COUNT)
     {
@@ -235,7 +175,7 @@ my_bool getLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
 void getLanguage_deinit(UDF_INIT *initid)
 {
     delete (FOString*)initid->ptr;
-    debugEcho("------------- foFunction -> GetLanguage End --------------");
+    debug_echo("------------- foFunction -> GetLanguage End --------------");
 }
 
 
@@ -245,7 +185,7 @@ void getLanguage_deinit(UDF_INIT *initid)
 */
 char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error)
 {
-    debugBegin(false, true);
+    debug_begin(false, true);
     if (!empty_arg(args, ARG_GET_LANGUAGE_DBCOLUMN))
     {
         // Get arguments from the function call.
@@ -280,10 +220,10 @@ char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
                 cfoLanguageHeader oLangaugeHeader;
                 oLangaugeHeader.load_from_string(dbColumn);
                 oLangaugeHeader.debug_print();
-                debugEchoEX("ValidationCode=",   validationCode);
-                debugEchoEX("firstLanguage=",    firstLanguage);
-                debugEchoEX("secondLanguage=",   secondLanguage);
-                debugEchoEX("default_language=", default_language);
+                debug_echo_ex("ValidationCode=",   validationCode);
+                debug_echo_ex("firstLanguage=",    firstLanguage);
+                debug_echo_ex("secondLanguage=",   secondLanguage);
+                debug_echo_ex("default_language=", default_language);
             #endif
 
             // Set easier to use variables

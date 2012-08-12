@@ -33,8 +33,8 @@ Dflags = -pg
 
 all: $(builddir)/test runtest $(builddir)/folanguage.so
 
-$(builddir)/test: $(testdir)/test.cpp $(testdir)/test_string.cpp $(testdir)/test_data_type_size.cpp $(srcdir)/fo_string.h
-	gcc -o $(builddir)/test $(CTESTFLAGS) $(TESTINCLUDE) ./build/unittest-cpp/UnitTest++/libUnitTest++.a $(testdir)/test.cpp $(testdir)/test_string.cpp $(testdir)/test_data_type_size.cpp
+$(builddir)/test: $(testdir)/test.cpp $(testdir)/test_string.cpp $(testdir)/test_data_type_size.cpp $(testdir)/test_language.cpp $(srcdir)/fo_string.h $(srcdir)/udf.hpp $(srcdir)/udf.cpp $(srcdir)/fo_language.hpp $(srcdir)/fo_language.cpp
+	gcc -o $(builddir)/test $(CTESTFLAGS) $(TESTINCLUDE) ./build/unittest-cpp/UnitTest++/libUnitTest++.a $(testdir)/test.cpp $(testdir)/test_string.cpp $(testdir)/test_data_type_size.cpp $(testdir)/test_language.cpp $(srcdir)/udf.hpp $(srcdir)/udf.cpp $(srcdir)/fo_language.hpp $(srcdir)/fo_language.cpp
 
 runtest:
 	@echo ""
