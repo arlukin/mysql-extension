@@ -1,20 +1,23 @@
-/***************************************************************************
-*	Debug functions.
-*
-*	Functions that will print debug information to the mysql error file.
-*
-*	The define FO_LANGUGE_DEBUG_MODE, needs to be true, to get the
-*	debug information.
-*
-*	@author Daniel Lindh <daniel@fareoffice.com>
-*	@package FoFunctions
-*	@subpackage FoDebug
-*	@filesource
-***************************************************************************/
+/*
 
+Functions that will print debug information to the mysql error file.
+
+The define FO_LANGUGE_DEBUG_MODE, needs to be true, to get the
+debug information.
+
+__author__     = "daniel.lindh@cybercow.se"
+__copyright__  = "Copyright 2012, Fareoffice CRS AB"
+__maintainer__ = "Daniel Lindh"
+__credits__    = "???"
+__license__    = "???"
+__version__    = "1.0.0"
+__status__     = "Production"
+
+*/
 
 
 #include <stdio.h>
+
 
 #ifdef FO_LANGUGE_DEBUG_MODE
 	//

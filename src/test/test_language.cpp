@@ -1,11 +1,23 @@
+/*
+
+Test the udf functions.
+
+__author__     = "daniel.lindh@cybercow.se"
+__copyright__  = "Copyright 2012, Fareoffice CRS AB"
+__maintainer__ = "Daniel Lindh"
+__credits__    = "???"
+__license__    = "???"
+__version__    = "1.0.0"
+__status__     = "Production"
+
+*/
+
+
 #include <string>
-
 #include <UnitTest++.h>
-
 #include <fo_string.h>
 #include <fo_language.hpp>
 #include <udf.hpp>
-
 using namespace std;
 
 
@@ -86,15 +98,7 @@ void set_udf_arg(UDF_ARGS *args, int const index, int const value)
 
 void set_udf_arg(UDF_ARGS *args, int index, const FOString & foString)
 {
-    //TODO: behövs detta?
-    // if (foString == NULL)
-    // {
-    //     set_empty_UDFARG(args, index);
-    // }
-    // else
-    {
-        set_udf_arg(args, index, foString.get(), foString.length());
-    }
+    set_udf_arg(args, index, foString.get(), foString.length());
 }
 
 
@@ -188,9 +192,6 @@ TEST(select_set_language_NULL)
 
     CHECK_EQUAL(select_get_language(data, NULL, NULL, "0"), "");
 }
-
-
-#include <iostream>
 
 
 TEST(fo_language)
