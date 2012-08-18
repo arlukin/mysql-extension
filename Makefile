@@ -74,7 +74,6 @@ endef
 
 all: $(test)
 
-
 # Build 'lib'
 $(lib): $(objects)
 	@echo
@@ -90,6 +89,7 @@ $(test): $(lib) $(test_objects)
 	@echo
 	echo Running unit tests...
 	@./$(test)
+	valgrind --tool=memcheck ./$(test)
 
 clean:
 	-@$(RM) $(objects) $(test_objects) $(dependencies) $(test_dependencies) $(test) $(lib) 2> /dev/null
@@ -99,7 +99,6 @@ clean:
 	@echo Compile $<
 	@$(call make-depend,$<,$@,$(subst .o,.d,$@))
 	@$(CXX) $(CXXFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
-
 
 
 # # Not legal make config

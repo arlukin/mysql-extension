@@ -3,6 +3,7 @@ TODO
 
 * Activate debug and fix all errors
 * Move build files to build folder.
+* make install -- installs the module in mysql
 * Rewrite all ./test/*
 * Rewrite all ./bin/*
 * More refactoring???
