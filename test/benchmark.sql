@@ -1,1 +1,0 @@
-SELECT BENCHMARK(1000,setLanguage('', "England", "UK", "FI")) as 6dot74;

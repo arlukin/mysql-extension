@@ -1,13 +1,25 @@
+#
+# Create database
+#
+CREATE DATABASE foTest;
+use foTest;
 
-# Test without database table
-SELECT setLanguage(NULL, '[LANG=UK_]Hello world.[/LANG]', NULL, 'SE_') as foLanguageColumn;
-
-# Test with database table
+#
+# Create test table
+#
 DROP TABLE IF EXISTS foLanguageTest;
 CREATE TABLE foLanguageTest (id int NOT NULL AUTO_INCREMENT, `description` text NULL, PRIMARY KEY (id));
 
-TRUNCATE foLanguageTest;
 
+#
+# Test without database table
+#
+SELECT setLanguage(NULL, '[LANG=UK_]Hello world.[/LANG]', NULL, 'SE_') as foLanguageColumn;
+
+
+#
+# Test with database table
+#
 INSERT into foLanguageTest (id, description) values(1, setLanguage(NULL, "Sverige", "SE_", ''));
 UPDATE foLanguageTest SET description = setLanguage(description, "England", "UK_", "FI_") WHERE id = 1 ;
 UPDATE foLanguageTest SET description = setLanguage(description, "Finland", "FI_", "UK_") WHERE id = 1;
@@ -67,17 +79,25 @@ SELECT getLanguage(description, "NON", 'NON', 	1) AS France2 FROM foLanguageTest
 SELECT getLanguage(description, "NON", 'NON', 	2) AS empty FROM foLanguageTest;
 SELECT getLanguage(description, "NON", 'NON', 	3) AS SimpleTagFrance2 FROM foLanguageTest;
 
+
+#
 # How fast is the function
+#
 # NOTE: Remember to turn of debug mode in the code
 SELECT BENCHMARK(10000000,setLanguage('', "England", "UK", "FI")) as 15dot50;
 SELECT BENCHMARK(10000000,getLanguage(setLanguage('', "England", "UK", "FI"), "UK", NULL, 0)) as 18dot08;
 
+
+#
+# Test carriage return.
+#
 INSERT into foLanguageTest (description) values(setLanguage(NULL, "England\neng", "UK", ''));
 SELECT getLanguage(description, "UK", 'UK', 'N') as description  FROM foLanguageTest order by description;
 
 
+#
 # Translate a regulare column to a foLanguageColumn.
-
+#
 INSERT into foLanguageTest (id, description) values(3, "1");
 INSERT into foLanguageTest (id, description) values(4, "12");
 INSERT into foLanguageTest (id, description) values(5, "123");
@@ -86,4 +106,10 @@ INSERT into foLanguageTest (id, description) values(7, "12345");
 
 UPDATE foLanguageTest SET description = setLanguage(NULL, description, "UK_", "UK_") WHERE id in (3, 4, 5, 6, 7);
 
-SELECT id, getLanguage(description, NULL, "UK_", 	3) FROM foLanguageTest WHERE id in (3, 4, 5, 6, 7);
+SELECT id, getLanguage(description, NULL, "UK_", 3) FROM foLanguageTest WHERE id in (3, 4, 5, 6, 7);
+
+
+#
+# Drop test database.
+#
+DROP DATABASE foTest;

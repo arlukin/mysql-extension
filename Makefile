@@ -89,7 +89,13 @@ $(test): $(lib) $(test_objects)
 	@echo
 	echo Running unit tests...
 	@./$(test)
+
 	valgrind --tool=memcheck ./$(test)
+
+	mysql -uroot -p foTest < ./test/test.sql
+
+	tail /var/log/mysqld.log
+
 
 clean:
 	-@$(RM) $(objects) $(test_objects) $(dependencies) $(test_dependencies) $(test) $(lib) 2> /dev/null
@@ -100,6 +106,24 @@ clean:
 	@$(call make-depend,$<,$@,$(subst .o,.d,$@))
 	@$(CXX) $(CXXFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
 
+install:
+	sudo /etc/init.d/mysqld stop
+	cp ../Bin/FoFunctions.so /var/lib/mysql/plugins/FoFunctions.so
+	cp ../Bin/FoLanguage.so  /var/lib/mysql/plugins/FoLanguage.so
+	sudo /etc/init.d/mysqld start
+
+	#mysql -uroot -p
+	#use mysql;
+
+	#DROP function getLanguage;
+	#DROP function setLanguage;
+
+	#CREATE FUNCTION getLanguage RETURNS STRING SONAME "FoLanguage.so";
+	#CREATE FUNCTION setLanguage RETURNS STRING SONAME "FoLanguage.so";
+
+requirments:
+	yum -y install mysql-devel
+	yum -y install gcc-c++
 
 # # Not legal make config
 # unittet: UnitTest-install
