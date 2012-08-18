@@ -1,58 +1,72 @@
 #ifndef _cString_h
 #define _cString_h
 
+#include <string.h>
+
 class FOString
 {
 private:
 	int	_length;
-	char * str;
+	char * _str;
 
 public:
 
 	FOString(int len = 0)
 	{
 		_length = 0;
-		str = NULL;
+		_str = NULL;
 		allocate_buffer(len);
 	};
 
+   	// Copy constructor
+    FOString(const FOString &source)
+    {
+        set(source.get(), source.length());
+    }
+
+	FOString& operator=(const FOString &source)
+	{
+		set(source.get(), source.length());
+		return *this;
+	}
+
 	~FOString()
 	{
-		delete[] str;
+		delete[] _str;
 	};
 
 	inline void allocate_buffer(int len)
 	{
 		if (_length < len)
 		{
-			if (str != NULL)
+			if (_str != NULL)
 			{
-				delete[] str;
-				str = NULL;
+				delete[] _str;
+				_str = NULL;
 			}
 
 			_length = len;
-			str = new char[_length];
+			_str = new char[_length];
 			// Fill string with string terminators.
 			for (int i=0;i < _length;i++)
-				str[i] = '\0';
+				_str[i] = '\0';
 		}
 	};
 
-	inline int length()
+	const int& length() const
 	{
 		return _length;
 	};
 
-	inline char* get()
+	char * get() const
 	{
-		return str;
+		return _str;
 	};
 
 	inline void set(char const * const string, int len)
 	{
 		allocate_buffer(len);
-		memcpy(str, string, len);
+		memcpy(_str, string, len);
 	};
 
 	//
@@ -63,7 +77,7 @@ public:
 	inline void overwrite(int position, char value)
 	{
 		allocate_buffer(position + sizeof(value));
-		*((char*)(str+position)) = value;
+		*((char*)(_str+position)) = value;
 	};
 
 	inline void overwrite(int *position, char value)
@@ -76,7 +90,7 @@ public:
 	inline void overwrite(int position, unsigned short value)
 	{
 		allocate_buffer(position + sizeof(value));
-		*((unsigned short*)(str+position)) = value;
+		*((unsigned short*)(_str+position)) = value;
 	};
 
 	inline void overwrite(int *position, unsigned short value)
@@ -89,7 +103,7 @@ public:
 	inline void overwrite(int position, unsigned int value)
 	{
 		allocate_buffer(position + sizeof(value));
-		*((unsigned int*)(str+position)) = value;
+		*((unsigned int*)(_str+position)) = value;
 	};
 
 	inline void overwrite(int *position, unsigned int value)
@@ -102,7 +116,7 @@ public:
 	inline void overwrite(int position, unsigned long value)
 	{
 		allocate_buffer(position + sizeof(value));
-		*((unsigned long*)(str+position)) = value;
+		*((unsigned long*)(_str+position)) = value;
 	};
 
 	inline void overwrite(int * position, unsigned long value)
@@ -115,7 +129,7 @@ public:
 	inline void overwrite(int position, char const * const value, int len)
 	{
 		allocate_buffer(position + len);
-		memcpy(str+position, value, len);
+		memcpy(_str+position, value, len);
 	};
 
 	inline void overwrite(int * position, char const * const value, int const len)

@@ -13,17 +13,10 @@
 ***************************************************************************/
 
 
-// Enable/Disable debug mode!
-// #define FO_LANGUGE_DEBUG_MODE
 
-#ifndef FO_LANGUGE_DEBUG_MODE
-	#define debug_begin(level1, level2)
-	#define debug_echo_prefix()
-	#define debug_echo(text)
-	#define debug_echo_ex(text, value)
-	#define debug_print_string(dbColumn, length)
+#include <stdio.h>
 
-#else
+#ifdef FO_LANGUGE_DEBUG_MODE
 	//
 	// These global variables may cause some errors. Becuase the mysql module
 	// needs to be build thread safe, with no global variables.
@@ -32,13 +25,6 @@
 	//
 	int debugCounter1 = 0;
 	int debugCounter2 = 0;
-
-	#define debug_begin(level1, level2) _debug_begin(level1, level2)
-	#define debug_echo_prefix() _debug_echo_prefix(__FILE__, __LINE__)
-	#define debug_echo(text) _debug_echo(__FILE__, __LINE__, text)
-    #define debug_echo_ex(text, value) _debug_echo(__FILE__, __LINE__, text, value)
-	#define debug_print_string(dbColumn, length) _debug_print_string(__FILE__, __LINE__, dbColumn, length)
-
 
 	/**
 	* Handles prefix counter for _debug_echo_prefix, used

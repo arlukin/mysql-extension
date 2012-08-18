@@ -4,7 +4,10 @@
 //
 /////////////////////////////////////////////////////////
 
-include <udf.hpp>
+#include <udf.hpp>
+#include <fo_debug.hpp>
+#include <fo_string.h>
+#include <fo_language.hpp>
 
 /**
 * Verify if an UDF argument (mysql column) is null or "" (empty).
@@ -21,6 +24,58 @@ inline bool empty_arg(const UDF_ARGS * const args, const int index)
         return false;
 }
 
+
+/**
+* Modify: initid->ptr, initid->max_length, textLength
+*
+* Stoppar in en ny språk text i foLanguage struct arrayen,
+* men parsar först newText strängen.
+*
+* @access private
+*/
+void createReturnString
+(
+        UDF_INIT * const initid, char const * const dataAreaPos,
+        U32 const * const textStartPos, U32 &textLength,
+        char const * const firstLanguage, char const * const foundLanguage
+)
+{
+    FOString * foString = (FOString*)initid->ptr;
+
+    if (textStartPos == NULL)
+    {
+        foString->set(dataAreaPos, textLength);
+    }
+    else
+    {
+        U32 orginalTextLength = textLength;
+
+        if (foundLanguage != NULL && textStartPos != NULL)
+            textLength += (foLDC_OPENTAGSIZE+foLDC_CLOSETAGSIZE)*2;
+
+        foString->allocate_buffer(textLength);
+        int initidWritePos = 0;
+
+        if (foundLanguage != NULL)
+        {
+            foString->overwrite(&initidWritePos, "[LANG=", 6);
+            foString->overwrite(&initidWritePos, firstLanguage, foLDC_LANGUAGESIZE);
+            foString->overwrite(&initidWritePos, "]", 1);
+            foString->overwrite(&initidWritePos, "[/LANG]", foLDC_CLOSETAGSIZE);
+
+            foString->overwrite(&initidWritePos, "[LANG=", 6);
+            foString->overwrite(&initidWritePos, foundLanguage, foLDC_LANGUAGESIZE);
+            foString->overwrite(&initidWritePos, "]", 1);
+        }
+
+        foString->overwrite(&initidWritePos, dataAreaPos+*textStartPos, orginalTextLength);
+
+        if (foundLanguage != NULL)
+        {
+            foString->overwrite(&initidWritePos, "[/LANG]", foLDC_CLOSETAGSIZE);
+        }
+    }
+}
 
 /////////////////////////////////////////////////////////
 //
@@ -46,14 +101,14 @@ my_bool setLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
     }
     else
     {
-        args->arg_type[ARG_SET_LANGUAGE_DBCOLUMN]               = STRING_RESULT;
-        args->arg_type[ARG_SET_LANGUAGE_NEWTEXT]                    = STRING_RESULT;
-        args->arg_type[ARG_SET_LANGUAGE_LANGUAGE]           = STRING_RESULT;
+        args->arg_type[ARG_SET_LANGUAGE_DBCOLUMN]            = STRING_RESULT;
+        args->arg_type[ARG_SET_LANGUAGE_NEWTEXT]             = STRING_RESULT;
+        args->arg_type[ARG_SET_LANGUAGE_LANGUAGE]            = STRING_RESULT;
         args->arg_type[ARG_SET_LANGUAGE_default_language]    = STRING_RESULT;
 
         initid->decimals = 0;
         initid->maybe_null = 1;
-        initid->max_length = 16000000; // Can return a maximum of this.
+        initid->max_length = 1600000; // Can return a maximum of this.
         initid->ptr = (char *)new FOString;    // Allocate 255 byte to begin with.
 
         return 0;
@@ -153,14 +208,15 @@ my_bool getLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
     }
     else
     {
-        args->arg_type[ARG_GET_LANGUAGE_DBCOLUMN]       = STRING_RESULT;
-        args->arg_type[ARG_GET_LANGUAGE_FIRSTLANG]      = STRING_RESULT;
-        args->arg_type[ARG_GET_LANGUAGE_SECONDLANG]   = STRING_RESULT;
-        args->arg_type[ARG_GET_LANGUAGE_VIEWMODE]           = INT_RESULT;
+        args->arg_type[ARG_GET_LANGUAGE_DBCOLUMN]   = STRING_RESULT;
+        args->arg_type[ARG_GET_LANGUAGE_FIRSTLANG]  = STRING_RESULT;
+        args->arg_type[ARG_GET_LANGUAGE_SECONDLANG] = STRING_RESULT;
+        args->arg_type[ARG_GET_LANGUAGE_VIEWMODE]   = STRING_RESULT;
 
         initid->decimals = 0;
         initid->maybe_null = 1;
-        initid->max_length = 16000000; // Can return a maximum of this.
+        initid->max_length = 1600000; // Can return a maximum of this.
+        // @todo, maybe use *result instead?
         initid->ptr = (char *)new FOString;    // Allocate 255 byte to begin with.
 
         return 0;
@@ -210,7 +266,11 @@ char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
             char *default_language = NULL;
 
             // Should we use the default value from the foLanuageColumn.
-            if (*args->args[ARG_GET_LANGUAGE_VIEWMODE] == 1 || *args->args[ARG_GET_LANGUAGE_VIEWMODE] == 3)
+            if
+            (
+                (strncmp(args->args[ARG_GET_LANGUAGE_VIEWMODE], "1", 1) == 0) ||
+                (strncmp(args->args[ARG_GET_LANGUAGE_VIEWMODE], "3", 1) == 0)
+            )
             {
                 default_language = dbColumn+foLDC_default_language;
             }
@@ -265,8 +325,15 @@ char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
                         textLength = *((U32*)(indexReadPos+foLDC_LANGUAGESIZE+4));
                         languageFound = true;
 
-                        if (*args->args[ARG_GET_LANGUAGE_VIEWMODE] == 2 || *args->args[ARG_GET_LANGUAGE_VIEWMODE] == 3)
+                        if
+                        (
+                            (strncmp(args->args[ARG_GET_LANGUAGE_VIEWMODE], "2", 1) == 0) ||
+                            (strncmp(args->args[ARG_GET_LANGUAGE_VIEWMODE], "3", 1) == 0)
+                        )
+                        {
                             foundLanguagePos = indexReadPos;
+
+                        }
                     }
 
                     // Jump to next index "row"

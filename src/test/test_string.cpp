@@ -1,6 +1,6 @@
 #include <UnitTest++.h>
-#include <string.h>
 #include <fo_string.h>
+
 
 TEST(string_construction_1)
 {
@@ -10,6 +10,7 @@ TEST(string_construction_1)
     CHECK(str.get() == (void*)NULL);
 }
 
+
 TEST(string_construction_2)
 {
     FOString str(10);
@@ -17,6 +18,7 @@ TEST(string_construction_2)
     CHECK_EQUAL(str.length(), 10);
     CHECK(str.get() != (void*)NULL);
 }
+
 
 TEST(string_allocate_buffer)
 {
@@ -30,6 +32,7 @@ TEST(string_allocate_buffer)
     CHECK(str.get() != (void*)NULL);
 }
 
+
 TEST(string_set)
 {
     FOString str(10);
@@ -37,8 +40,9 @@ TEST(string_set)
     char tst[] = "1234567890";
     str.set(tst, 10);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1234567890");
+    CHECK(strncmp(str.get(), "1234567890", 10) == 0);
 }
+
 
 TEST(string_overwrite_char)
 {
@@ -56,15 +60,16 @@ TEST(string_overwrite_char)
     str.overwrite(pos, value);
     CHECK_EQUAL(pos, 1);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C34567890");
+    CHECK(strncmp(str.get(), "1C34567890", 10) == 0);
 
     pos = 2;
     value = 48;
     str.overwrite(pos, value);
     CHECK_EQUAL(pos, 2);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C04567890");
+    CHECK(strncmp(str.get(), "1C04567890", 10) == 0);
 }
+
 
 TEST(string_overwrite_char_pointer)
 {
@@ -82,14 +87,15 @@ TEST(string_overwrite_char_pointer)
     str.overwrite(&pos, value);
     CHECK_EQUAL(pos, 1+1);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C34567890");
+    CHECK(strncmp(str.get(), "1C34567890", 10) == 0);
 
     value = 48;
     str.overwrite(&pos, value);
     CHECK_EQUAL(pos, 1+2);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C04567890");
+    CHECK(strncmp(str.get(), "1C04567890", 10) == 0);
 }
+
 
 TEST(string_overwrite_unsigned_short)
 {
@@ -107,15 +113,16 @@ TEST(string_overwrite_unsigned_short)
     str.overwrite(pos, value);
     CHECK_EQUAL(pos, 1);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C04567890");
+    CHECK(strncmp(str.get(), "1C04567890", 10) == 0);
 
     pos = 3;
     value = (69 << 8)|68;
     str.overwrite(pos, value);
     CHECK_EQUAL(pos, 3);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C0DE67890");
+    CHECK(strncmp(str.get(), "1C0DE67890", 10) == 0);
 }
+
 
 TEST(string_overwrite_unsigned_short_pointer)
 {
@@ -134,14 +141,15 @@ TEST(string_overwrite_unsigned_short_pointer)
     str.overwrite(&pos, value);
     CHECK_EQUAL(pos, 1+2);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C04567890");
+    CHECK(strncmp(str.get(), "1C04567890", 10) == 0);
 
     value = (69 << 8)|68;
     str.overwrite(&pos, value);
     CHECK_EQUAL(pos, 1+4);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C0DE67890");
+    CHECK(strncmp(str.get(), "1C0DE67890", 10) == 0);
 }
+
 
 TEST(string_overwrite_unsigned_int)
 {
@@ -159,15 +167,16 @@ TEST(string_overwrite_unsigned_int)
     str.overwrite(pos, value);
     CHECK_EQUAL(pos, 1);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C0DE67890");
+    CHECK(strncmp(str.get(), "1C0DE67890", 10) == 0);
 
     pos = 5;
     value = (69 << 24)|68 << 16|(48 << 8)|67;
     str.overwrite(pos, value);
     CHECK_EQUAL(pos, 5);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C0DEC0DE0");
+    CHECK(strncmp(str.get(), "1C0DEC0DE0", 10) == 0);
 }
+
 
 TEST(string_overwrite_unsigned_int_pointer)
 {
@@ -185,14 +194,15 @@ TEST(string_overwrite_unsigned_int_pointer)
     str.overwrite(&pos, value);
     CHECK_EQUAL(pos, 5);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C0DE67890");
+    CHECK(strncmp(str.get(), "1C0DE67890", 10) == 0);
 
     value = (69 << 24)|68 << 16|(48 << 8)|67;
     str.overwrite(&pos, value);
     CHECK_EQUAL(pos, 9);
     CHECK_EQUAL(str.length(), 10);
-    CHECK_EQUAL(str.get(), "1C0DEC0DE0");
+    CHECK(strncmp(str.get(), "1C0DEC0DE0", 10) == 0);
 }
+
 
 TEST(string_overwrite_unsigned_long)
 {
@@ -211,14 +221,15 @@ TEST(string_overwrite_unsigned_long)
     str.overwrite(pos, value);
     CHECK_EQUAL(pos, 1);
     CHECK_EQUAL(str.length(), 20);
-    CHECK_EQUAL(str.get(), "1C0DEC0DE01234567890");
+    CHECK(strncmp(str.get(), "1C0DEC0DE01234567890", 20) == 0);
 
     pos = 9;
     str.overwrite(pos, value);
     CHECK_EQUAL(pos, 9);
     CHECK_EQUAL(str.length(), 20);
-    CHECK_EQUAL(str.get(), "1C0DEC0DEC0DEC0DE890");
+    CHECK(strncmp(str.get(), "1C0DEC0DEC0DEC0DE890", 20) == 0);
 }
+
 
 TEST(string_overwrite_unsigned_long_pointer)
 {
@@ -237,13 +248,14 @@ TEST(string_overwrite_unsigned_long_pointer)
     str.overwrite(&pos, value);
     CHECK_EQUAL(pos, 9);
     CHECK_EQUAL(str.length(), 20);
-    CHECK_EQUAL(str.get(), "1C0DEC0DE01234567890");
+    CHECK(strncmp(str.get(), "1C0DEC0DE01234567890", 20) == 0);
 
     str.overwrite(&pos, value);
     CHECK_EQUAL(pos, 17);
     CHECK_EQUAL(str.length(), 20);
-    CHECK_EQUAL(str.get(), "1C0DEC0DEC0DEC0DE890");
+    CHECK(strncmp(str.get(), "1C0DEC0DEC0DEC0DE890", 20) == 0);
 }
+
 
 TEST(string_overwrite_const_char_pointer)
 {
@@ -261,14 +273,15 @@ TEST(string_overwrite_const_char_pointer)
     str.overwrite(pos, value, 4);
     CHECK_EQUAL(pos, 1);
     CHECK_EQUAL(str.length(), 20);
-    CHECK_EQUAL(str.get(), "1C0DE678901234567890");
+    CHECK(strncmp(str.get(), "1C0DE678901234567890", 20) == 0);
 
     pos = 5;
     str.overwrite(pos, value, 4);
     CHECK_EQUAL(pos, 5);
     CHECK_EQUAL(str.length(), 20);
-    CHECK_EQUAL(str.get(), "1C0DEC0DE01234567890");
+    CHECK(strncmp(str.get(), "1C0DEC0DE01234567890", 20) == 0);
 }
+
 
 TEST(string_overwrite_const_char_pointer_pointer)
 {
@@ -286,10 +299,10 @@ TEST(string_overwrite_const_char_pointer_pointer)
     str.overwrite(&pos, value, 4);
     CHECK_EQUAL(pos, 5);
     CHECK_EQUAL(str.length(), 20);
-    CHECK_EQUAL(str.get(), "1C0DE678901234567890");
+    CHECK(strncmp(str.get(), "1C0DE678901234567890", 20) == 0);
 
     str.overwrite(&pos, value, 4);
     CHECK_EQUAL(pos, 9);
     CHECK_EQUAL(str.length(), 20);
-    CHECK_EQUAL(str.get(), "1C0DEC0DE01234567890");
+    CHECK(strncmp(str.get(), "1C0DEC0DE01234567890", 20) == 0);
 }

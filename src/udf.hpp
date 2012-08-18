@@ -1,6 +1,44 @@
 #ifndef FO_UDF_H
 #define FO_UDF_H
 
+#ifdef STANDARD
+    #include <stdio.h>
+    #include <string.h>
+#else
+    #include <my_global.h>      // myssql 4
+    #include <my_sys.h>
+#endif
+
+#include <mysql.h>
+#include <m_ctype.h>
+#include <m_string.h>
+
+// typedef bool my_bool;
+
+
+// enum Item_result {STRING_RESULT,REAL_RESULT,INT_RESULT};
+
+
+// typedef struct st_udf_args
+// {
+//   unsigned int arg_count;       /* Number of arguments */
+//   enum Item_result *arg_type;   /* Pointer to item_results */
+//   char **args;                  /* Pointer to argument */
+//   unsigned long *lengths;       /* Length of string arguments */
+//   char *maybe_null;              Set to 1 for all maybe_null args
+// } UDF_ARGS;
+
+
+// typedef struct st_udf_init
+// {
+//   bool maybe_null;          /* 1 if function can return NULL */
+//   unsigned int decimals;    /* for real functions */
+//   unsigned int max_length;  /* For string functions */
+//   char    *ptr;             /* free pointer for function data */
+//   bool const_item;          /* 0 if result is independent of arguments */
+// } UDF_INIT;
+
+
 //
 // Used by mysqld to find the symbol table in the .so file.
 //
@@ -38,9 +76,9 @@ extern "C"
 *     select setLanguage(NULL, "Moi mukulat]", "FI", "UK") as description;
 *
 */
-#define ARG_SET_LANGUAGE_DBCOLUMN        0
-#define ARG_SET_LANGUAGE_NEWTEXT         1
-#define ARG_SET_LANGUAGE_LANGUAGE        2
+#define ARG_SET_LANGUAGE_DBCOLUMN         0
+#define ARG_SET_LANGUAGE_NEWTEXT          1
+#define ARG_SET_LANGUAGE_LANGUAGE         2
 #define ARG_SET_LANGUAGE_default_language 3
 
 #define ARG_SET_LANGUAGE_COUNT  4

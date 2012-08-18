@@ -1,7 +1,7 @@
 //
 // Includes to build a mysql UDF.
 //
-/*
+
 #ifdef STANDARD
 	#include <stdio.h>
 	#include <string.h>
@@ -13,14 +13,13 @@
 #include <mysql.h>
 #include <m_ctype.h>
 #include <m_string.h>
-*/
+
 
 #include <stdio.h>
 #include <string.h>
 
-#include "fo_string.h"
-#include "fo_debug.cpp"
-#include "fo_language.hpp"
+#include <fo_debug.hpp>
+#include <fo_language.hpp>
 
 
 void cfoLanguageHeader::load_from_string(char const * const dbColumn)

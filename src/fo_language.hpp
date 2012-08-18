@@ -1,6 +1,8 @@
 #ifndef FO_LANGUAGE_H
 #define FO_LANGUAGE_H
 
+#include "fo_string.h"
+
 // Define variables that can vary on different OS.
 typedef unsigned char  U8;
 typedef unsigned short U16;
@@ -48,7 +50,7 @@ public:
     char * default_language; // Will be the size of foLDC_default_language
 
     void load_from_string(char const * const dbColumn);
-    inline void debug_print();
+    void debug_print();
 };
 
 
@@ -60,7 +62,7 @@ public:
     U32 *length;
 
     void load_from_string(char const * const dbColumn, U32 indexPos, U32 indexNumber);
-    inline void debug_print();
+    void debug_print();
 };
 
 
@@ -131,7 +133,7 @@ public:
     /**
     * Print debug info about the object instance.
     */
-    inline void debug_print();
+    void debug_print();
 
 
 private:
