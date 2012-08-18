@@ -1,4 +1,19 @@
-This document includes different releases of the foLanguage.so mysql function.
+TODO
+====
+
+* Activate debug and fix all errors
+* Move build files to build folder.
+* Rewrite all ./test/*
+* Rewrite all ./bin/*
+* More refactoring???
+
+* In mysql 5.1, we might need to use plugins instead of UDF?
+  http://dev.mysql.com/doc/refman/5.1/en/plugin-api.html
+
+
+
+CHANGELOG
+=========
 
 ### 2006-08-25 ###
 * Mysql function setLanguage() will now return NULL when no language is set.
