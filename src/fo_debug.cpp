@@ -15,8 +15,11 @@ __status__     = "Production"
 
 */
 
-
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <fo_debug.hpp>
 
 
 #ifdef FO_LANGUGE_DEBUG_MODE
@@ -29,13 +32,8 @@ __status__     = "Production"
 	int debugCounter1 = 0;
 	int debugCounter2 = 0;
 
-	/**
-	* Handles prefix counter for _debug_echo_prefix, used
-	* for grouping many debug_echo() output to one section.
-	*
-	*	@access public
-	*/
-	void _debug_begin(bool level1 = true, bool level2=false)
+
+	void _debug_begin(bool level1, bool level2)
 	{
 		if (level1)
 		{
@@ -53,30 +51,31 @@ __status__     = "Production"
 	/**
 	* Writes the debug prefix to the mysql error file.
 	*/
-	void _debug_echo_prefix(char * file, int line)
+	void _debug_echo_prefix(char const * const file, int line)
 	{
-		fprintf(stderr, "%d-%d (%s - %d) ", debugCounter1, debugCounter2,  file, line);
+		fprintf
+		(
+			stderr, "%d-%d (%s - %d) ",
+			debugCounter1, debugCounter2, file, line
+		);
 	}
 
 
-	/**
-	* Writes a text to the mysql error file, with a prefix.
-	*/
-	void _debug_echo(char * file, int line, char const * const text)
+	void _debug_echo(char const * const file, int line, char const * const text)
 	{
 		_debug_echo_prefix(file, line);
 		fprintf(stderr, "%s\n", text);
 	}
 
 
-	void _debug_echo(char * file, int line, char const * const text, unsigned short *value)
+	void _debug_echo(char const * const file, int line, char const * const text, unsigned short *value)
 	{
 		_debug_echo_prefix(file, line);
 		fprintf(stderr, "%s%u\n", text, *value);
 	}
 
 
-	void _debug_echo(char * file, int line, char const * const text, char *value)
+	void _debug_echo(char const * const file, int line, char const * const text, char *value)
 	{
 		_debug_echo_prefix(file, line);
 		fprintf(stderr, "%s%s\n", text, value);
@@ -85,7 +84,7 @@ __status__     = "Production"
 
 	void _debug_echo
 	(
-		char * file,
+		char const * const file,
 		int line,
 		char const * const text,
 		long unsigned int value
@@ -96,13 +95,9 @@ __status__     = "Production"
 	}
 
 
-	/**
-	* Writes what's in the dbColumn string, character by character,
-	* both with charachter, number and memory adress.
-	*/
 	void _debug_print_string
 	(
-		char * file, int line,
+		char const * const file, int line,
 		char const * const dbColumn,
 		int length
 	)
@@ -117,7 +112,7 @@ __status__     = "Production"
 			sizeof(bytePos)
 		);
 
-		_debug_echo(file, line,"---------- foFunction - Debug string --------");
+		_debug_echo(file, line,"---------- foFunction - Debug string -------");
 		for (unsigned short i=0; i<length ;i++)
 		{
 			bytePos = (unsigned char*)(dbColumn+i);
@@ -136,7 +131,7 @@ __status__     = "Production"
 				*bytePos
 			);
 		}
-		_debug_echo(file, line,"---------------------------------------------");
+		_debug_echo(file, line,"--------------------------------------------");
 	}
 
 

@@ -29,9 +29,9 @@ test = $(BUILDDIR)testFoLanguage
 INCLUDE = -I./ -I./src/ -I./build/UnitTest++/src/ -I/usr/include/mysql/
 
 # All files that should be compiled to generate 'lib'
-src = src/fo_string.cpp \
-      src/fo_debug.cpp \
+src = src/fo_debug.cpp \
       src/fo_language.cpp \
+      src/fo_string.cpp \
       src/udf.cpp
 
 # All files that should be compiled to generate 'test'
@@ -92,9 +92,9 @@ $(test): $(lib) $(test_objects)
 
 	valgrind --tool=memcheck ./$(test)
 
-	mysql -uroot -p foTest < ./test/test.sql
+	#mysql -uroot -p foTest < ./test/test.sql
 
-	tail /var/log/mysqld.log
+	#tail /var/log/mysqld.log
 
 
 clean:

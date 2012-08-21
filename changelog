@@ -1,11 +1,10 @@
 TODO
 ====
 
-* Activate debug and fix all errors
-* Move build files to build folder.
-* make install -- installs the module in mysql
 * Rewrite all ./test/*
-* Rewrite all ./bin/*
+* make should run the php test and the sql file test.
+* make install -- installs the module in mysql
+* Move build files to build folder.
 * More refactoring???
 
 * In mysql 5.1, we might need to use plugins instead of UDF?
