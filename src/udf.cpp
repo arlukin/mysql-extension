@@ -231,7 +231,7 @@ my_bool getLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
         initid->decimals = 0;
         initid->maybe_null = 1;
         initid->max_length = 1600000; // Can return a maximum of this.
-        // @todo, maybe use *result instead?
+
         initid->ptr = (char *)new FOString;    // Allocate 255 byte to begin with.
 
         return 0;

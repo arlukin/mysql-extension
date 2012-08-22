@@ -18,11 +18,6 @@
 # http://www.gnu.org/software/make/manual/make.html
 # http://mrbook.org/tutorials/make/
 #
-# TODO
-# ----
-# * Add the compiler marfre talked about
-# * Run unittests before installing into mysql
-# * Run "integration-tests" when installed into mysql
 #
 # __author__     = "daniel.lindh@cybercow.se"
 # __copyright__  = "Copyright 2012, Fareoffice CRS AB"
@@ -126,10 +121,6 @@ $(test): $(libpath) $(test_objects)
 
 	@LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH valgrind --tool=memcheck ./$(test)
 
-	#mysql -uroot -p foTest < ./test/test.sql
-
-	#tail /var/log/mysqld.log
-
 #
 # Compile all cpp files into object files.
 #
@@ -160,15 +151,21 @@ clean:
 # Install the module into mysql.
 #
 install:
+	# Execute unittests before installing into mysql.
+	@LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH ./$(test)
+
+	# Installing the .so file.
 	service mysqld stop
 	cp $(libpath) $(libexecdir)$(lib)
 	cp $(libpath) $(libexecdir)$(lib)
 	service mysqld start
 	chmod 755 $(libexecdir)$(lib)
 
+	# Activate the udf functions in mysql
 	mysql -uroot mysql -e 'DROP function IF EXISTS getLanguage;'
 	mysql -uroot mysql -e 'DROP function IF EXISTS setLanguage;'
 	mysql -uroot mysql -e 'CREATE FUNCTION getLanguage RETURNS STRING SONAME "$(lib)";'
 	mysql -uroot mysql -e 'CREATE FUNCTION setLanguage RETURNS STRING SONAME "$(lib)"; '
 
+	# Run unittests using the actual UDF module.
 	./test/test.py
