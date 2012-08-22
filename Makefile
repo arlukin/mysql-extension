@@ -69,8 +69,8 @@ RM = rm
 #CFLAGS =  -lstdc++
 
 #
-objects = $(patsubst %.cpp, %.o, $(src))
-test_objects = $(patsubst %.cpp, %.o, $(test_src))
+objects = $(patsubst src/%.cpp, $(BUILDDIR)%.o, $(src))
+test_objects = $(patsubst src/test/%.cpp, $(BUILDDIR)%.o, $(test_src))
 dependencies = $(subst .o,.d,$(objects))
 test_dependencies = $(subst .o,.d,$(test_objects))
 
@@ -119,16 +119,21 @@ $(test): $(libpath) $(test_objects)
 	echo Running unit tests...
 	@LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH ./$(test)
 
+	# Look for memory leaks.
 	@LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH valgrind --tool=memcheck ./$(test)
 
 #
 # Compile all cpp files into object files.
 #
-%.o : %.cpp
+build/%.o : src/%.cpp
 	@echo Compile $<
 	@$(call make-depend,$<,$@,$(subst .o,.d,$@))
-	@$(CXX) $(CXXFLAGS) -c $< -o $(patsubst %.cpp, %.o, $<)
+	@$(CXX) $(CXXFLAGS) -c $< -o $(patsubst src/%.cpp, build/%.o, $<)
 
+build/%.o : src/test/%.cpp
+	@echo Compile $<
+	@$(call make-depend,$<,$@,$(subst .o,.d,$@))
+	@$(CXX) $(CXXFLAGS) -c $< -o $(patsubst src/test/%.cpp, build/%.o, $<)
 #
 # UnitTest++ - A library used to create unit tests.
 #
