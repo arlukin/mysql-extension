@@ -1,10 +1,6 @@
 TODO
 ====
 
-* Run sql file test against mysql.
-* make should run the php test and the sql file test.
-* Add benchmark test to make file.
-* Rewrite all ./test/*
 * Move build files to build folder.
 * More refactoring and optimization and comments???
 * Test on mysql4

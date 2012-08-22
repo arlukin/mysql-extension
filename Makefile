@@ -170,3 +170,5 @@ install:
 	mysql -uroot mysql -e 'DROP function IF EXISTS setLanguage;'
 	mysql -uroot mysql -e 'CREATE FUNCTION getLanguage RETURNS STRING SONAME "$(lib)";'
 	mysql -uroot mysql -e 'CREATE FUNCTION setLanguage RETURNS STRING SONAME "$(lib)"; '
+
+	./test/test.py
