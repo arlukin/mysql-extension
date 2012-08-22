@@ -25,6 +25,10 @@ REQUIRMENTS
 COMPILE AND INSTALL
 ===================
 
+Install all yum packages required to build the foLanguage module.
+
+        make requirements
+
 Compile the module. This will also run all unit tests and valgrind to find any
 memory leeks.
 
