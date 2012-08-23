@@ -92,7 +92,7 @@ all: $(test)
 #
 # yum packages required to build foLanguage.
 #
-requirments:
+requirements:
 	yum -y install mysql-devel gcc-c++ unzip
 
 #
