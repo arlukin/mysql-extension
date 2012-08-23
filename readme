@@ -1,16 +1,33 @@
-foLanguage
-==========
+Fareoffice Language
+===================
 
 Used to save multiple translations of a text in one mysql column.
 
 This is very useful if you have an existing database model which stores texts
 that you in a later stage want to translate to different languages. With this
 plugin module, you will not need to redesign your database model. It's also
-useful if you don't want a "cluttered" database modell where "every" table
+useful if you don't want a "cluttered" database model where "every" table
 has a relation to your translation tables.
 
 The texts are loaded from and saved to the database with two UDF functions,
 getLanguage and setLanguage.
+
+        INSERT INTO foLanguageTest
+            (id, description)
+        VALUES
+            (1, setLanguage(NULL, "Sverige", "SE_", ""));
+
+        UPDATE
+            foLanguageTest
+        SET
+            description = setLanguage(description, "England", "UK_", "FI_")
+        WHERE
+            id = 1;
+
+        SELECT
+            getLanguage(description, "FI_", "UK_", 1)
+        FROM
+            foLanguageTest';
 
 
 REQUIRMENTS
@@ -34,31 +51,27 @@ memory leeks.
 
         make
 
-Install the plugin in to mysql plugin folder.
+Install the plugin into mysql plugin folder. More unit tests will be executed
+when the module is installed.
 
         make install
-
-Test the plugin with sql queries.
-
-        php test/test.php.
-
 
 FOLDERS
 =======
 
-    bin            - Executable scipts.
-    build        - Where all build files will be generated.
+    bin         - Executable scipts.
+    build       - Where all build files will be generated.
     src         - All source code
 
 
 DOCUMENTATION
 =============
 
-Format of the foLanguageColumn.
+Format of the fo_language_column.
 ------------------------------
 
-The foLanguageColumn is saved in a "blob" column in the mysql. The format of
-the information is saved in the following struct.
+The fo_language_column is saved in a "blob" column in mysql. The format of the
+information is saved in the following struct.
 
 HEADER
 INDEX*n
@@ -68,18 +81,18 @@ HEADER
 ------
 
 		NAME             | SIZE   | Description
-		------------------------------------------------------------------------------
-		validationcode   | word   | Defines that this is a foLanguageColumn. IE: 655536.
+		-----------------------------------------------------------------------------
+		validation_code  | word   | Defines that this is a fo_language_column. IE: 655536.
 		version          | byte   | Current version of the language struct format.
-		numOfLanguage    | word   | Number of different languages saved in the column.
-		indexpos         | dword  | Position where the index are saved.
-		datapos          | dword  | Position where the texts are saved.
+		num_of_Language  | word   | Number of different languages saved in the column.
+		index_pos        | dword  | Position where the index are saved.
+		data_pos         | dword  | Position where the texts are saved.
 		default_language | word   | Two character representation of default language.
 
 INDEX
 -----
 
-The ndex saved in a mysql column is repeated for each language. The first
+The index saved in a mysql column is repeated for each language. The first
 language in the index part are the default language.
 
 	    NAME     | SIZE               | Description
@@ -101,7 +114,7 @@ DATA
 EXAMPLES
 ========
 
-The file Sql/testLanguge.sql demonstrates the functionality of foLanguage.
+The file test/test.py demonstrates the functionality of foLanguage.
 At the same time as it tests that the functions works as they should on the
 mysql server.
 

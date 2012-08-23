@@ -1,4 +1,3 @@
-#
 # Make file for foLanguage and unittests.
 #
 # To build and install foLanguage execute the following.
@@ -8,8 +7,8 @@
 #	make install
 #
 #
-# Read more
-# ---------
+# Read more about make files
+# --------------------------
 #
 # http://mrbook.org/tutorials/make/
 # http://stackoverflow.com/questions/2374863/makefile-build-directory-and-dependencies-list
