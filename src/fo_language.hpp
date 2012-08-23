@@ -28,11 +28,11 @@ typedef unsigned long  U64;
 #define foLDC_LANGUAGESIZE 3    // Number of chars in the language code "SE_"
 
 // Positions in the foLanguageDataColumn
-#define foLDC_VALIDATION        0  // Size 2 bytes
-#define foLDC_VERSION           2  // Size 1 byte
-#define foLDC_NUMOFLANGUAGE     3  // Size 2 bytes
-#define foLDC_INDEXPOS          5  // Size 4 bytes
-#define foLDC_DATAPOS           9  // Size 4 bytes
+#define foLDC_VALIDATION         0  // Size 2 bytes
+#define foLDC_VERSION            2  // Size 1 byte
+#define foLDC_NUMOFLANGUAGE      3  // Size 2 bytes
+#define foLDC_index_pos          5  // Size 4 bytes
+#define foLDC_data_pos           9  // Size 4 bytes
 #define foLDC_default_language  13 // Size foLDC_LANGUAGESIZE
 
 #define foLDC_HEADERSIZE        (13+foLDC_LANGUAGESIZE)
@@ -42,7 +42,7 @@ typedef unsigned long  U64;
 
 // Positions in the index part.
 #define foLDC_INDEX_LANGUAGE    0                        // Size languagesize bytes
-#define foLDC_INDEX_STARTPOS    foLDC_LANGUAGESIZE       // Size 4 bytes
+#define foLDC_INDEX_start_pos    foLDC_LANGUAGESIZE       // Size 4 bytes
 #define foLDC_INDEX_LENGTH      (4+foLDC_LANGUAGESIZE)   // Size 4 bytes
 #define foLDC_INDEX_SIZE        (foLDC_LANGUAGESIZE+4+4) // Size of one index section
 
@@ -55,14 +55,14 @@ typedef unsigned long  U64;
 class cfoLanguageHeader
 {
 public:
-    unsigned short *validationCode;
+    unsigned short *validation_code;
     char  *version;
-    unsigned short *numOfLanguages;
-    U32 *indexPos;
-    U32 *dataPos;
+    unsigned short *num_of_languages;
+    U32 *index_pos;
+    U32 *data_pos;
     char * default_language; // Will be the size of foLDC_default_language
 
-    void load_from_string(char const * const dbColumn);
+    void load_from_string(char const * const db_column);
     void debug_print();
 };
 
@@ -71,10 +71,10 @@ class cfoLanguageIndex
 {
 public:
     char *language; // Will be the size of foLDC_default_language
-    U32 *startPos;
+    U32 *start_pos;
     U32 *length;
 
-    void load_from_string(char const * const dbColumn, U32 indexPos, U32 indexNumber);
+    void load_from_string(char const * const db_column, U32 const index_pos, U32 const index_number);
     void debug_print();
 };
 
@@ -84,12 +84,12 @@ class cfoLanguage
 {
 
 public:
-    unsigned short allocatedLanguageCount;  // Number of languages their is allocated space for.
-    unsigned short languageCount;           // Number of languages
+    unsigned short allocated_language_count;  // Number of languages their is allocated space for.
+    unsigned short language_count;           // Number of languages
     char **language;                        // The language length is foLDC_LANGUAGESIZE. 'SE_'
     char **data;
-    U32 *dataLengths;
-    U32 totalDataLength;                    // Sum of the dataLengths
+    U32 *data_lengths;
+    U32 total_data_length;                    // Sum of the data_lengths
     char default_language[foLDC_LANGUAGESIZE];
 
     /**
@@ -105,12 +105,12 @@ public:
     /**
     * Load language data from the database column.
     */
-    void load_language_data(char const * const dbColumn);
+    void load_language_data(char const * const db_column);
 
     /**
     *   Adds a language text to the foLanguage struct array.
     *
-    *   @param  char*   languageCode
+    *   @param  char*   language_code
     *                   The language code for the text entered in text. ie. SE_
     *
     *   @param  char*   text
@@ -120,7 +120,7 @@ public:
     */
     void set_language_arr
     (
-        char const * const languageCode,
+        char const * const language_code,
         char const * const text,
         int const length
     );
@@ -155,12 +155,12 @@ private:
     /**
     *   Delete language from the datastruct foLanguage.
     */
-    int _delete_language_arr(char const * const languageCode);
+    int _delete_language_arr(char const * const language_code);
 
     /**
     *   Get the array index for a language.
     */
-    int _get_language_position(char const * const languageCode);
+    int _get_language_position(char const * const language_code);
 
     /**
     * Write the index and data information for a language to the string that
@@ -168,7 +168,7 @@ private:
     */
     void _write_language_data
     (
-        FOString * foString, int * indexWPos, int * dataWPos, int const dataStartPos,
+        FOString * fo_string, int * index_w_pos, int * data_w_pos, int const data_start_pos,
         char const * const language, char const * const text, U32 const length
     );
 };

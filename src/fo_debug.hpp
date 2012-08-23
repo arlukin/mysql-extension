@@ -19,8 +19,9 @@ __status__     = "Production"
 #include <stdlib.h>
 #include <string.h>
 
-
+//
 // Enable/Disable debug mode!
+//
 // #define FO_LANGUGE_DEBUG_MODE
 
 
@@ -31,7 +32,7 @@ __status__     = "Production"
 	#define debug_echo_prefix()
 	#define debug_echo(text)
 	#define debug_echo_ex(text, value)
-	#define debug_print_string(dbColumn, length)
+	#define debug_print_string(db_column, length)
 
 
 #else
@@ -41,7 +42,7 @@ __status__     = "Production"
 	#define debug_echo_prefix() _debug_echo_prefix(__FILE__, __LINE__)
 	#define debug_echo(text) _debug_echo(__FILE__, __LINE__, text)
     #define debug_echo_ex(text, value) _debug_echo(__FILE__, __LINE__, text, value)
-	#define debug_print_string(dbColumn, length) _debug_print_string(__FILE__, __LINE__, dbColumn, length)
+	#define debug_print_string(db_column, length) _debug_print_string(__FILE__, __LINE__, db_column, length)
 
 	/**
 	* Handles prefix counter for _debug_echo_prefix, used
@@ -49,7 +50,7 @@ __status__     = "Production"
 	*
 	*	@access public
 	*/
-	void _debug_begin(bool level1 = true, bool level2=false);
+	void _debug_begin(bool const level1 = true, bool const level2=false);
 
 	/**
 	* Writes the debug prefix to the mysql error file.
@@ -67,21 +68,22 @@ __status__     = "Production"
 	void _debug_echo
 	(
 		char const * const file,
-		int line,
+		int const line,
 		char const * const text,
-		long unsigned int value
+		long unsigned int const value
 	);
 
 
 	/**
-	* Writes what's in the dbColumn string, character by character,
+	* Writes what's in the db_column string, character by character,
 	* both with charachter, number and memory adress.
 	*/
 	void _debug_print_string
 	(
-		char const * const file, int line,
-		char const * const dbColumn,
-		int length
+		char const * const file,
+		int const line,
+		char const * const db_column,
+		int const length
 	);
 
 

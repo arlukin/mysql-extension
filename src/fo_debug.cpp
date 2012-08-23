@@ -27,21 +27,21 @@ __status__     = "Production"
 	//
 	// But it looks to work for singel user mode.
 	//
-	int debugCounter1 = 0;
-	int debugCounter2 = 0;
+	int debug_counter1 = 0;
+	int debug_counter2 = 0;
 
 
-	void _debug_begin(bool level1, bool level2)
+	void _debug_begin(bool const level1, bool const level2)
 	{
 		if (level1)
 		{
-			debugCounter1++;
-			debugCounter2 = 0;
+			debug_counter1++;
+			debug_counter2 = 0;
 		}
 
 		if (level2)
 		{
-			debugCounter2++;
+			debug_counter2++;
 		}
 	}
 
@@ -49,31 +49,31 @@ __status__     = "Production"
 	/**
 	* Writes the debug prefix to the mysql error file.
 	*/
-	void _debug_echo_prefix(char const * const file, int line)
+	void _debug_echo_prefix(char const * const file, int const line)
 	{
 		fprintf
 		(
 			stderr, "%d-%d (%s - %d) ",
-			debugCounter1, debugCounter2, file, line
+			debug_counter1, debug_counter2, file, line
 		);
 	}
 
 
-	void _debug_echo(char const * const file, int line, char const * const text)
+	void _debug_echo(char const * const file, int const line, char const * const text)
 	{
 		_debug_echo_prefix(file, line);
 		fprintf(stderr, "%s\n", text);
 	}
 
 
-	void _debug_echo(char const * const file, int line, char const * const text, unsigned short *value)
+	void _debug_echo(char const * const file, int const line, char const * const text, unsigned short *value)
 	{
 		_debug_echo_prefix(file, line);
 		fprintf(stderr, "%s%u\n", text, *value);
 	}
 
 
-	void _debug_echo(char const * const file, int line, char const * const text, char *value)
+	void _debug_echo(char const * const file, int const line, char const * const text, char *value)
 	{
 		_debug_echo_prefix(file, line);
 		fprintf(stderr, "%s%s\n", text, value);
@@ -83,9 +83,9 @@ __status__     = "Production"
 	void _debug_echo
 	(
 		char const * const file,
-		int line,
+		int const line,
 		char const * const text,
-		long unsigned int value
+		long unsigned int const value
 	)
 	{
 		_debug_echo_prefix(file, line);
@@ -96,37 +96,37 @@ __status__     = "Production"
 	void _debug_print_string
 	(
 		char const * const file, int line,
-		char const * const dbColumn,
-		int length
+		char const * const db_column,
+		int const length
 	)
 	{
-		unsigned char * bytePos;
-		unsigned short * shortPos;
-		unsigned int * intPos;
+		unsigned char * byte_pos;
+		unsigned short * short_pos;
+		unsigned int * int_pos;
 		fprintf
 		(
 			stderr,
-			"bytePos(%lu)\n",
-			sizeof(bytePos)
+			"byte_pos(%lu)\n",
+			sizeof(byte_pos)
 		);
 
 		_debug_echo(file, line,"---------- foFunction - Debug string -------");
 		for (unsigned short i=0; i<length ;i++)
 		{
-			bytePos = (unsigned char*)(dbColumn+i);
-			shortPos = (unsigned short*)(dbColumn+i);
-			intPos = (unsigned int*)(dbColumn+i);
+			byte_pos = (unsigned char*)(db_column+i);
+			short_pos = (unsigned short*)(db_column+i);
+			int_pos = (unsigned int*)(db_column+i);
 			_debug_echo_prefix(file, line);
 			fprintf
 			(
 				stderr,
 				"Pos(%2d), Adr(%lu), UByte(%3d), UShort(%5d), UInt(%10d), Chr(%c)\n",
 				i,
-				(unsigned long)bytePos,
-				abs(*bytePos),
-				abs(*shortPos),
-				abs(*intPos),
-				*bytePos
+				(unsigned long)byte_pos,
+				abs(*byte_pos),
+				abs(*short_pos),
+				abs(*int_pos),
+				*byte_pos
 			);
 		}
 		_debug_echo(file, line,"--------------------------------------------");

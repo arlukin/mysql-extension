@@ -94,9 +94,9 @@ void set_udf_arg(UDF_ARGS *args, int const index, int const value)
 }
 
 
-void set_udf_arg(UDF_ARGS *args, int index, const FOString & foString)
+void set_udf_arg(UDF_ARGS *args, int index, const FOString & fo_string)
 {
-    set_udf_arg(args, index, foString.get(), foString.length());
+    set_udf_arg(args, index, fo_string.get(), fo_string.length());
 }
 
 
@@ -116,7 +116,7 @@ void set_udf_arg_num(UDF_ARGS *args, int index, double value)
 /**
 * Emulate MYSQL behavious calling SQL query "select setLanguage(XX)"
 */
-FOString select_set_language(const FOString & dbColumn, char const * const newText, char const *  const language, char const * const defaultLanuage)
+FOString select_set_language(const FOString & db_column, char const * const newText, char const *  const language, char const * const defaultLanuage)
 {
     UDF_INIT initid;
     unsigned long length;
@@ -128,7 +128,7 @@ FOString select_set_language(const FOString & dbColumn, char const * const newTe
     // Initializing arguments from SQL query.
     UDF_ARGS args = create_udf_arg(ARG_SET_LANGUAGE_COUNT);
 
-    set_udf_arg(&args, ARG_SET_LANGUAGE_DBCOLUMN,         dbColumn);
+    set_udf_arg(&args, ARG_SET_LANGUAGE_db_column,         db_column);
     set_udf_arg(&args, ARG_SET_LANGUAGE_NEWTEXT,          newText);
     set_udf_arg(&args, ARG_SET_LANGUAGE_LANGUAGE,         language);
     set_udf_arg(&args, ARG_SET_LANGUAGE_default_language, defaultLanuage);
@@ -152,7 +152,7 @@ FOString select_set_language(const FOString & dbColumn, char const * const newTe
 /**
 * Emulate MYSQL behavious calling SQL query "select getLanguage(XX)"
 */
-string select_get_language(const FOString & dbColumn, char const * const  firstLang, char const * const secondLang, char const * const viewMode)
+string select_get_language(const FOString & db_column, char const * const  firstLang, char const * const secondLang, char const * const viewMode)
 {
     UDF_INIT initid;
     unsigned long length;
@@ -164,7 +164,7 @@ string select_get_language(const FOString & dbColumn, char const * const  firstL
     // Initializing arguments from SQL query.
     UDF_ARGS args = create_udf_arg(ARG_GET_LANGUAGE_COUNT);
 
-    set_udf_arg(&args, ARG_GET_LANGUAGE_DBCOLUMN,   dbColumn);
+    set_udf_arg(&args, ARG_GET_LANGUAGE_db_column,   db_column);
     set_udf_arg(&args, ARG_GET_LANGUAGE_FIRSTLANG,  firstLang);
     set_udf_arg(&args, ARG_GET_LANGUAGE_SECONDLANG, secondLang);
     set_udf_arg(&args, ARG_GET_LANGUAGE_VIEWMODE,   viewMode);
