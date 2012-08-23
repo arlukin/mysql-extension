@@ -12,22 +12,22 @@ has a relation to your translation tables.
 The texts are loaded from and saved to the database with two UDF functions,
 getLanguage and setLanguage.
 
-        INSERT INTO foLanguageTest
-            (id, description)
-        VALUES
-            (1, setLanguage(NULL, "Sverige", "SE_", ""));
+    INSERT INTO foLanguageTest
+        (id, description)
+    VALUES
+        (1, setLanguage(NULL, "Sverige", "SE_", ""));
 
-        UPDATE
-            foLanguageTest
-        SET
-            description = setLanguage(description, "England", "UK_", "FI_")
-        WHERE
-            id = 1;
+    UPDATE
+        foLanguageTest
+    SET
+        description = setLanguage(description, "England", "UK_", "FI_")
+    WHERE
+        id = 1;
 
-        SELECT
-            getLanguage(description, "FI_", "UK_", 1)
-        FROM
-            foLanguageTest';
+    SELECT
+        getLanguage(description, "FI_", "UK_", 1)
+    FROM
+        foLanguageTest';
 
 
 REQUIRMENTS
@@ -44,17 +44,17 @@ COMPILE AND INSTALL
 
 Install all yum packages required to build the foLanguage module.
 
-        make requirements
+    make requirements
 
 Compile the module. This will also run all unit tests and valgrind to find any
 memory leeks.
 
-        make
+    make
 
 Install the plugin into mysql plugin folder. More unit tests will be executed
 when the module is installed.
 
-        make install
+    make install
 
 FOLDERS
 =======
@@ -80,14 +80,14 @@ DATA*n
 HEADER
 ------
 
-		NAME             | SIZE   | Description
-		-----------------------------------------------------------------------------
-		validation_code  | word   | Defines that this is a fo_language_column. IE: 655536.
-		version          | byte   | Current version of the language struct format.
-		num_of_Language  | word   | Number of different languages saved in the column.
-		index_pos        | dword  | Position where the index are saved.
-		data_pos         | dword  | Position where the texts are saved.
-		default_language | word   | Two character representation of default language.
+	NAME             | SIZE   | Description
+	-----------------------------------------------------------------------------
+	validation_code  | word   | Defines that this is a fo_language_column. IE: 655536.
+	version          | byte   | Current version of the language struct format.
+	num_of_Language  | word   | Number of different languages saved in the column.
+	index_pos        | dword  | Position where the index are saved.
+	data_pos         | dword  | Position where the texts are saved.
+	default_language | word   | Two character representation of default language.
 
 INDEX
 -----
@@ -95,12 +95,12 @@ INDEX
 The index saved in a mysql column is repeated for each language. The first
 language in the index part are the default language.
 
-	    NAME     | SIZE               | Description
-	    ------------------------------------------------------------------------------------
-	    language | foLDC_LANGUAGESIZE | Language code represented by X number of character.
-	    startpos | dword              | Position where the text for this language is started.
-	             |                    | 0 is datapos. Excluding [LANG TAG.
-	    length   | dword              | Length of the text. Excluding [LANG TAG.
+    NAME     | SIZE               | Description
+    ------------------------------------------------------------------------------------
+    language | foLDC_LANGUAGESIZE | Language code represented by X number of character.
+    startpos | dword              | Position where the text for this language is started.
+             |                    | 0 is datapos. Excluding [LANG TAG.
+    length   | dword              | Length of the text. Excluding [LANG TAG.
 
 
 DATA
