@@ -57,7 +57,7 @@ test_src = src/test/test.cpp \
 #
 CXX = g++
 CXXDEBUG = -g
-CXXFLAGS ?= $(CXXDEBUG) -Wall -W -ansi -fPIC $(INCLUDE) # -pedantic
+CXXFLAGS ?= $(CXXDEBUG) -Wall -W -ansi -O3 -fPIC $(INCLUDE) # -pedantic
 LDFLAGS ?= -L$(BUILDDIR)/UnitTest++ -lUnitTest++
 SED = sed
 MV = mv
@@ -117,7 +117,7 @@ $(test): $(libpath) $(test_objects)
 	@LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH ./$(test)
 
 	# Look for memory leaks.
-	@LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH valgrind --tool=memcheck ./$(test)
+	@LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH valgrind --leak-check=full ./$(test)
 
 #
 # Compile all cpp files into object files.

@@ -231,7 +231,7 @@ def benchmark():
 
     '''
     print
-    print("Test speed of function. Should be less than 10 seconds.")
+    print("Test speed of function. Should be around 6 seconds.")
     Timer.start()
     vrf('SELECT BENCHMARK(10000000, getLanguage(setLanguage("", "England", "UK", "FI"), "UK", NULL, 0))', '0');
     Timer.stop()
