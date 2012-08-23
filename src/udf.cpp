@@ -1,6 +1,6 @@
 /*
 
-The UDF functions.
+The UDF functions that are callable from mysql
 
 __author__     = "daniel.lindh@cybercow.se"
 __copyright__  = "Copyright 2012, Fareoffice CRS AB"
@@ -11,16 +11,18 @@ __status__     = "Production"
 */
 
 
+#include <udf.hpp>
+#include <fo_debug.hpp>
+#include <fo_string.h>
+#include <fo_language.hpp>
+
+
 /////////////////////////////////////////////////////////
 //
 // PRIVATE:
 //
 /////////////////////////////////////////////////////////
 
-#include <udf.hpp>
-#include <fo_debug.hpp>
-#include <fo_string.h>
-#include <fo_language.hpp>
 
 /**
 * Verify if an UDF argument (mysql column) is null or "" (empty).
@@ -29,7 +31,7 @@ __status__     = "Production"
 *
 * @access private
 */
-inline bool empty_arg(const UDF_ARGS * const args, const int index)
+inline bool empty_arg(UDF_ARGS const * const args, const int index)
 {
     if (args->args[index] == NULL || args->lengths[index] == 0)
         return true;
@@ -39,53 +41,58 @@ inline bool empty_arg(const UDF_ARGS * const args, const int index)
 
 
 /**
-* Modify: initid->ptr, initid->max_length, textLength
+* Modify: initid->ptr, initid->max_length, text_length
 *
-* Stoppar in en ny språk text i foLanguage struct arrayen,
-* men parsar först newText strängen.
+* Adds a 'language-text' to the foLanguage struct/array,
+* but will first parse the newText string.
 *
 * @access private
 */
 void createReturnString
 (
-        UDF_INIT * const initid, char const * const dataAreaPos,
-        U32 const * const textStartPos, U32 &textLength,
-        char const * const firstLanguage, char const * const foundLanguage
+        UDF_INIT * const initid,
+        char const * const data_area_pos,
+        U32 const * const text_start_pos,
+        U32 &text_length,
+        char const * const first_language,
+        char const * const found_language
 )
 {
-    FOString * foString = (FOString*)initid->ptr;
+    FOString * fo_string = (FOString*)initid->ptr;
 
-    if (textStartPos == NULL)
+    if (text_start_pos == NULL)
     {
-        foString->set(dataAreaPos, textLength);
+        fo_string->set(data_area_pos, text_length);
     }
     else
     {
-        U32 orginalTextLength = textLength;
+        U32 orginal_text_length = text_length;
 
-        if (foundLanguage != NULL && textStartPos != NULL)
-            textLength += (foLDC_OPENTAGSIZE+foLDC_CLOSETAGSIZE)*2;
-
-        foString->allocate_buffer(textLength);
-        int initidWritePos = 0;
-
-        if (foundLanguage != NULL)
+        if (found_language != NULL && text_start_pos != NULL)
         {
-            foString->overwrite(&initidWritePos, "[LANG=", 6);
-            foString->overwrite(&initidWritePos, firstLanguage, foLDC_LANGUAGESIZE);
-            foString->overwrite(&initidWritePos, "]", 1);
-            foString->overwrite(&initidWritePos, "[/LANG]", foLDC_CLOSETAGSIZE);
-
-            foString->overwrite(&initidWritePos, "[LANG=", 6);
-            foString->overwrite(&initidWritePos, foundLanguage, foLDC_LANGUAGESIZE);
-            foString->overwrite(&initidWritePos, "]", 1);
+            text_length += (foLDC_OPENTAGSIZE+foLDC_CLOSETAGSIZE)*2;
         }
 
-        foString->overwrite(&initidWritePos, dataAreaPos+*textStartPos, orginalTextLength);
+        fo_string->allocate_buffer(text_length);
+        int initidWritePos = 0;
 
-        if (foundLanguage != NULL)
+        if (found_language != NULL)
         {
-            foString->overwrite(&initidWritePos, "[/LANG]", foLDC_CLOSETAGSIZE);
+            fo_string->overwrite(&initidWritePos, "[LANG=", 6);
+            fo_string->overwrite(&initidWritePos, first_language, foLDC_LANGUAGESIZE);
+            fo_string->overwrite(&initidWritePos, "]", 1);
+            fo_string->overwrite(&initidWritePos, "[/LANG]", foLDC_CLOSETAGSIZE);
+
+            fo_string->overwrite(&initidWritePos, "[LANG=", 6);
+            fo_string->overwrite(&initidWritePos, found_language, foLDC_LANGUAGESIZE);
+            fo_string->overwrite(&initidWritePos, "]", 1);
+        }
+
+        fo_string->overwrite(&initidWritePos, data_area_pos+*text_start_pos, orginal_text_length);
+
+        if (found_language != NULL)
+        {
+            fo_string->overwrite(&initidWritePos, "[/LANG]", foLDC_CLOSETAGSIZE);
         }
     }
 }
@@ -98,6 +105,13 @@ void createReturnString
 
 
 /**
+* Executed before setLanguage.
+*
+* If setLanguage is executed on several rows in a table, this function will be
+* executed only once for the query. But setLanguage will be executed for each
+* row.
+*
+* Ie. select setLanguage(...) from TEST_TABLE
 *
 * @access public
 */
@@ -109,12 +123,12 @@ my_bool setLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
     if (args->arg_count < ARG_SET_LANGUAGE_COUNT)
     {
         // The message can be a maximum of MYSQL_ERRMSG_SIZE bytes long.
-        strcpy(message,"usage: char* = setLanguage(dbColumn, newText, language, default_language)");
+        strcpy(message,"usage: char* = setLanguage(db_column, newText, language, default_language)");
         return 1;
     }
     else
     {
-        args->arg_type[ARG_SET_LANGUAGE_DBCOLUMN]            = STRING_RESULT;
+        args->arg_type[ARG_SET_LANGUAGE_db_column]            = STRING_RESULT;
         args->arg_type[ARG_SET_LANGUAGE_NEWTEXT]             = STRING_RESULT;
         args->arg_type[ARG_SET_LANGUAGE_LANGUAGE]            = STRING_RESULT;
         args->arg_type[ARG_SET_LANGUAGE_default_language]    = STRING_RESULT;
@@ -130,7 +144,9 @@ my_bool setLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
 
 
 /**
+* Executed after setLanguage.
 *
+* @see setLanguage_init
 * @access public
 */
 void setLanguage_deinit(UDF_INIT *initid)
@@ -141,8 +157,10 @@ void setLanguage_deinit(UDF_INIT *initid)
 
 
 /**
+* Executed for each row in a query.
 *
-*   @access public
+* @see setLanguage_init
+* @access public
 */
 char *setLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error)
 {
@@ -151,9 +169,9 @@ char *setLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
 
     // Load the current language information, to add new language data to.
     // Can be NULL
-    if (!empty_arg(args, ARG_SET_LANGUAGE_DBCOLUMN))
+    if (!empty_arg(args, ARG_SET_LANGUAGE_db_column))
     {
-        foLanguage.load_language_data(args->args[ARG_SET_LANGUAGE_DBCOLUMN]);
+        foLanguage.load_language_data(args->args[ARG_SET_LANGUAGE_db_column]);
     }
 
     foLanguage.debug_print();
@@ -190,7 +208,7 @@ char *setLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
 
     foLanguage.fill_language_data(initid->ptr, length);
 
-    FOString * foString = (FOString*)initid->ptr;
+    FOString * fo_string = (FOString*)initid->ptr;
 
     if (*length == 0)
     {
@@ -199,12 +217,19 @@ char *setLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
     }
     else
     {
-        return foString->get();
+        return fo_string->get();
     }
 }
 
 
 /**
+* Executed before getLanguage.
+*
+* If getLanguage is executed on several rows in a table, this function will be
+* executed only once for the query. But getLanguage will be executed for each
+* row.
+*
+* Ie. select getLanguage(...) from TEST_TABLE
 *
 * @access public
 */
@@ -216,12 +241,12 @@ my_bool getLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
     if (args->arg_count < ARG_GET_LANGUAGE_COUNT)
     {
         // The message can be a maximum of MYSQL_ERRMSG_SIZE bytes long.
-        strcpy(message,"usage: char* = getLanguage(dbColumn, firstLanguage, secondLanguage, default_language)");
+        strcpy(message,"usage: char* = getLanguage(db_column, first_language, second_language, default_language)");
         return 1;
     }
     else
     {
-        args->arg_type[ARG_GET_LANGUAGE_DBCOLUMN]   = STRING_RESULT;
+        args->arg_type[ARG_GET_LANGUAGE_db_column]   = STRING_RESULT;
         args->arg_type[ARG_GET_LANGUAGE_FIRSTLANG]  = STRING_RESULT;
         args->arg_type[ARG_GET_LANGUAGE_SECONDLANG] = STRING_RESULT;
         args->arg_type[ARG_GET_LANGUAGE_VIEWMODE]   = STRING_RESULT;
@@ -238,8 +263,10 @@ my_bool getLanguage_init(UDF_INIT *initid, UDF_ARGS *args, char *message)
 
 
 /**
+* Executed after getLanguage.
 *
-*   @access public
+* @see getLanguage_init
+* @access public
 */
 void getLanguage_deinit(UDF_INIT *initid)
 {
@@ -249,31 +276,34 @@ void getLanguage_deinit(UDF_INIT *initid)
 
 
 /**
+* Executed for each row in a query.
 *
-*   @access public
+* @see getLanguage_init
+*
+* @access public
 */
 char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error)
 {
     debug_begin(false, true);
-    if (!empty_arg(args, ARG_GET_LANGUAGE_DBCOLUMN))
+    if (!empty_arg(args, ARG_GET_LANGUAGE_db_column))
     {
         // Get arguments from the function call.
-        char *dbColumn = args->args[ARG_GET_LANGUAGE_DBCOLUMN];
+        char *db_column = args->args[ARG_GET_LANGUAGE_db_column];
 
-        unsigned short * validationCode = (unsigned short*)(dbColumn+foLDC_VALIDATION);
-        if (*validationCode == foLDC_VALIDATE_CODE)
+        unsigned short * validation_code = (unsigned short*)(db_column+foLDC_VALIDATION);
+        if (*validation_code == foLDC_VALIDATE_CODE)
         {
-            char *firstLanguage  = NULL;
-            char *secondLanguage = NULL;
+            char *first_language  = NULL;
+            char *second_language = NULL;
 
             if (!empty_arg(args, ARG_GET_LANGUAGE_FIRSTLANG))
             {
-                firstLanguage = args->args[ARG_GET_LANGUAGE_FIRSTLANG];
+                first_language = args->args[ARG_GET_LANGUAGE_FIRSTLANG];
             }
 
             if (!empty_arg(args, ARG_GET_LANGUAGE_SECONDLANG))
             {
-                secondLanguage = args->args[ARG_GET_LANGUAGE_SECONDLANG];
+                second_language = args->args[ARG_GET_LANGUAGE_SECONDLANG];
             }
 
             char *default_language = NULL;
@@ -285,58 +315,58 @@ char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
                 (strncmp(args->args[ARG_GET_LANGUAGE_VIEWMODE], "3", 1) == 0)
             )
             {
-                default_language = dbColumn+foLDC_default_language;
+                default_language = db_column+foLDC_default_language;
             }
 
             // Debug code
             #ifndef FO_LANGUGE_DEBUG_MODE
-                cfoLanguageHeader oLangaugeHeader;
-                oLangaugeHeader.load_from_string(dbColumn);
-                oLangaugeHeader.debug_print();
-                debug_echo_ex("ValidationCode=",   validationCode);
-                debug_echo_ex("firstLanguage=",    firstLanguage);
-                debug_echo_ex("secondLanguage=",   secondLanguage);
+                cfoLanguageHeader langauge_header;
+                langauge_header.load_from_string(db_column);
+                langauge_header.debug_print();
+                debug_echo_ex("validation_code=",   validation_code);
+                debug_echo_ex("first_language=",    first_language);
+                debug_echo_ex("second_language=",   second_language);
                 debug_echo_ex("default_language=", default_language);
             #endif
 
             // Set easier to use variables
-            U32 * dbColumnDataPos = (U32*)(dbColumn+foLDC_DATAPOS);
-            U32 * dbColumnIndexPos = (U32 *)(dbColumn+foLDC_INDEXPOS);
+            U32 * db_columndata_pos = (U32*)(db_column+foLDC_data_pos);
+            U32 * db_columnindex_pos = (U32 *)(db_column+foLDC_index_pos);
 
-            U32 * textStartPos = NULL;
-            U32 textLength = 0;
-            bool languageFound = false;
-            char * foundLanguagePos = NULL;
+            U32 * text_start_pos = NULL;
+            U32 text_length = 0;
+            bool language_found = false;
+            char * found_languagePos = NULL;
 
             //
             // Read the data
             //
-            if (firstLanguage == NULL)
+            if (first_language == NULL)
             {
-                textStartPos = NULL;
-                textLength = args->lengths[ARG_GET_LANGUAGE_DBCOLUMN]-*dbColumnDataPos;
-                languageFound = true;
+                text_start_pos = NULL;
+                text_length = args->lengths[ARG_GET_LANGUAGE_db_column]-*db_columndata_pos;
+                language_found = true;
             }
             else
             {
-                char * indexReadPos = dbColumn+*dbColumnIndexPos;
-                for (int i=0;i<(char)(dbColumn[foLDC_NUMOFLANGUAGE]);i++)
+                char * index_read_pos = db_column+*db_columnindex_pos;
+                for (int i=0;i<(char)(db_column[foLDC_NUMOFLANGUAGE]);i++)
                 {
-                    // indexReadPos points to language
-                    if (strncmp(indexReadPos, firstLanguage, foLDC_LANGUAGESIZE) == 0)
+                    // index_read_pos points to language
+                    if (strncmp(index_read_pos, first_language, foLDC_LANGUAGESIZE) == 0)
                     {
-                        textStartPos = (U32*)(indexReadPos+foLDC_LANGUAGESIZE);
-                        textLength = *((U32*)(indexReadPos+foLDC_LANGUAGESIZE+4));
-                        foundLanguagePos = NULL;
-                        languageFound = true;
+                        text_start_pos = (U32*)(index_read_pos+foLDC_LANGUAGESIZE);
+                        text_length = *((U32*)(index_read_pos+foLDC_LANGUAGESIZE+4));
+                        found_languagePos = NULL;
+                        language_found = true;
                         break;
                     }
-                    else if ((secondLanguage != NULL && strncmp(indexReadPos, secondLanguage, foLDC_LANGUAGESIZE) == 0) ||
-                                     (default_language != NULL && languageFound == false && strncmp(indexReadPos, default_language, foLDC_LANGUAGESIZE) == 0))
+                    else if ((second_language != NULL && strncmp(index_read_pos, second_language, foLDC_LANGUAGESIZE) == 0) ||
+                                     (default_language != NULL && language_found == false && strncmp(index_read_pos, default_language, foLDC_LANGUAGESIZE) == 0))
                     {
-                        textStartPos = (U32*)(indexReadPos+foLDC_LANGUAGESIZE);
-                        textLength = *((U32*)(indexReadPos+foLDC_LANGUAGESIZE+4));
-                        languageFound = true;
+                        text_start_pos = (U32*)(index_read_pos+foLDC_LANGUAGESIZE);
+                        text_length = *((U32*)(index_read_pos+foLDC_LANGUAGESIZE+4));
+                        language_found = true;
 
                         if
                         (
@@ -344,26 +374,26 @@ char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
                             (strncmp(args->args[ARG_GET_LANGUAGE_VIEWMODE], "3", 1) == 0)
                         )
                         {
-                            foundLanguagePos = indexReadPos;
+                            found_languagePos = index_read_pos;
 
                         }
                     }
 
                     // Jump to next index "row"
-                    indexReadPos+=foLDC_INDEXSIZE;
+                    index_read_pos+=foLDC_INDEXSIZE;
                 }
             }
 
-            if (languageFound == true)
-                createReturnString(initid, dbColumn+*dbColumnDataPos, textStartPos, textLength, firstLanguage, foundLanguagePos);
+            if (language_found == true)
+                createReturnString(initid, db_column+*db_columndata_pos, text_start_pos, text_length, first_language, found_languagePos);
 
-            *length = textLength;
+            *length = text_length;
         }
         else
         {
-            *length = args->lengths[ARG_GET_LANGUAGE_DBCOLUMN];
-            U32 textLength = *length;
-            createReturnString(initid, dbColumn, 0, textLength, NULL, NULL);
+            *length = args->lengths[ARG_GET_LANGUAGE_db_column];
+            U32 text_length = *length;
+            createReturnString(initid, db_column, 0, text_length, NULL, NULL);
         }
     }
     else
@@ -378,7 +408,7 @@ char *getLanguage(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long 
     }
     else
     {
-        FOString * foString = (FOString*)initid->ptr;
-        return foString->get();
+        FOString * fo_string = (FOString*)initid->ptr;
+        return fo_string->get();
     }
 }

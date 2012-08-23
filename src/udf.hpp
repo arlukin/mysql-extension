@@ -41,17 +41,17 @@ extern "C"
 
 
 /**
-* char* = setLanguage(dbColumn, newText, language, default_language)
+* char* = setLanguage(db_column, newText, language, default_language)
 *
 * Concatenates a foLanguageColumn with a new language.
 *
 * Argument format
-*     [0]dbColumn         - "[LANGINDEX][LANG=SE]Hej världen[/LANG][LANG=UK]Hello world[/LANG]"
-*                           Can be null
-*     [1]newText          - "Moi mukulat"
-*                           Can be null, will delete the language indicated by [2]language.
-*     [2]language         - "FI"
-*                           If null, the [1]newText field must include the [LANG=xx] tag.
+*     [0]db_column          - "[LANGHEADER][LANGINDEX][LANG=SE]Hej världen[/LANG][LANG=UK]Hello world[/LANG]"
+*                            Can be null
+*     [1]newText           - "Moi mukulat"
+*                            Can be null, will delete the language indicated by [2]language.
+*     [2]language          - "FI"
+*                            If null, the [1]newText field must include the [LANG=xx] tag.
 *     [3]default_language  - "UK" can be null
 *
 * Return
@@ -62,20 +62,20 @@ extern "C"
 *     select setLanguage(NULL, "Moi mukulat]", "FI", "UK") as description;
 *
 */
-#define ARG_SET_LANGUAGE_DBCOLUMN         0
+#define ARG_SET_LANGUAGE_db_column         0
 #define ARG_SET_LANGUAGE_NEWTEXT          1
 #define ARG_SET_LANGUAGE_LANGUAGE         2
 #define ARG_SET_LANGUAGE_default_language 3
 
-#define ARG_SET_LANGUAGE_COUNT  4
+#define ARG_SET_LANGUAGE_COUNT            4
 
 
 /**
-* text = getLanguage(dbColumn, firstLang, secondLang, viewMode);
+* text = getLanguage(db_column, firstLang, secondLang, viewMode);
 *
 * Get a language from a foLanguageColumn.
 * Argument format
-*     [0]dbColumn   - "[LANGINDEX][LANG=SE]Hej världen[/LANG][LANG=UK]Hello world[/LANG]"
+*     [0]db_column   - "[LANGINDEX][LANG=SE]Hej världen[/LANG][LANG=UK]Hello world[/LANG]"
 *                     Can be null.
 *     [1]firstLang  - "SE"  Look for this lang first.
 *                     If null, return all the languages with tags.
@@ -95,11 +95,11 @@ extern "C"
 * Example
 *     select setLanguage(rule.rule_name, "FI", "UK", 1) as rule_name;
 */
-#define ARG_GET_LANGUAGE_DBCOLUMN   0
+#define ARG_GET_LANGUAGE_db_column   0
 #define ARG_GET_LANGUAGE_FIRSTLANG  1
 #define ARG_GET_LANGUAGE_SECONDLANG 2
 #define ARG_GET_LANGUAGE_VIEWMODE   3
 
-#define ARG_GET_LANGUAGE_COUNT  4
+#define ARG_GET_LANGUAGE_COUNT      4
 
 #endif
