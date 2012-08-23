@@ -1,20 +1,28 @@
-TODO
-====
-
-* More refactoring and optimization and comments???
-* Test on mysql4
-* Add the compiler marfre talked about
-* Maybe use *result instead, when returnig value from get/set language?
-
-* In mysql 5.1, we might need to use plugins instead of UDF?
-  http://dev.mysql.com/doc/refman/5.1/en/plugin-api.html
-
-
-
 CHANGELOG
 =========
 
-### 2006-08-25 ###
+2012-08-23 - Fareoffice Language 1.0.0
+--------------------------------------
+
+* Removed the biggest memory leak ever.
+* Added c++ unittests that uses the c++ lib without mysql.
+* Added unitest using the module in mysql.
+* Added make file to compile, test and install the module.
+* Added a build folder.
+* Deleted old code related to calcPrice etc., only keeping fo_language.
+* Deleted visualstudio debug files.
+* Deleted php and sql unittests.
+* Changed function/variable/class naming to just one standard.
+* Changed filename convention to more *nix like, and removed unused files.
+* Added lots comments and documentation.
+* Executing valgrinds memcheck after each build.
+* Big refactoring.
+* Tested on mysql5.
+* 10 000 000 setLanguage+getLanguage benchmark 6 sec on KVM guest.
+
+2006-08-25
+----------
+
 * Mysql function setLanguage() will now return NULL when no language is set.
   Before it was set to ''
 
@@ -31,8 +39,12 @@ CHANGELOG
 	FoFunctions.so
 	FoLanguage.so
 
-### 2005-08-xx ###
+2005-08-xx
+----------
+
 * Compiled on new server platform.
 
-### 2003-xx-xx ###
+2003-xx-xx
+----------
+
 * First version was created
