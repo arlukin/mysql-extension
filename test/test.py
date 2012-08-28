@@ -17,7 +17,7 @@ from time import time
 import subprocess
 
 
-class Timer():
+class Timer(object):
     '''
     Calculate the time it takes to execute the code between start and stop.
 
@@ -35,7 +35,7 @@ class Timer():
         print("Test time: %s seconds" % Mysql.elapsed)
 
 
-class Mysql():
+class Mysql(object):
     '''
     Execute an sql query through the mysql command line client.
 
@@ -74,7 +74,7 @@ class Mysql():
         return stdout
 
 
-class Statistics():
+class Statistics(object):
     '''
     Collect statistics about total unittests and tests that succeded.
 
