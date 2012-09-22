@@ -157,8 +157,7 @@ install:
 	@LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH ./$(test)
 
 	# Installing the .so file.
-	service mysqld stop
-	cp $(libpath) $(libexecdir)$(lib)
+	service mysqld stop	
 	cp $(libpath) $(libexecdir)$(lib)
 	service mysqld start
 	chmod 755 $(libexecdir)$(lib)
