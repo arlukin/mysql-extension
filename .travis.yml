@@ -1,6 +1,4 @@
 language: cpp
 compiler:
   - gcc
-before_install:
-  - sudo apt-get install -y mysql-devel gcc-c++ valgrind
 script: make
