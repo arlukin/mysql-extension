@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Update to latest centos
+yum -y update
+
+# Install a default mysql, at fareoffice we are installing mysql with syco.
+# This step should probably be done differently on a production server.
+yum -y install mysql-server
+
+cd /vagrant
+
+# Install requirements of mysql-extension, such as compilers and tools
+make requirements
+
+# Build the mysql-extension modules and it's dependencies. Run c++ unittests
+# afterward
+make
+
+# Install the extension in the installed mysql server. Run c++ unittests and
+# tests and benchmarks against the mysql server in a test database.
+make install

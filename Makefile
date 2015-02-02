@@ -24,7 +24,6 @@
 # __version__    = "1.0.0"
 # __status__     = "Production"
 
-
 # Where the plugin is installed.
 libexecdir = /usr/lib64/mysql/plugin/
 
@@ -39,7 +38,7 @@ libpath = $(BUILDDIR)$(lib)
 test = $(BUILDDIR)testFoLanguage
 
 # Include pathes where compiler looks for header files and other includes.
-INCLUDE = -I./ -I./src/ -I$(BUILDDIR)/UnitTest++/src/ -I/usr/include/mysql/
+INCLUDE = -I./ -I./src/ -I$(BUILDDIR)/unittest-cpp-1.4/src/ -I/usr/include/mysql/
 
 # All files that should be compiled to generate 'lib'
 src = src/fo_debug.cpp \
@@ -58,7 +57,7 @@ test_src = src/test/test.cpp \
 CXX = g++
 CXXDEBUG = -g
 CXXFLAGS ?= $(CXXDEBUG) -Wall -W -ansi -O3 -fPIC $(INCLUDE) # -pedantic
-LDFLAGS ?= -L$(BUILDDIR)/UnitTest++ -lUnitTest++
+LDFLAGS ?= -L$(BUILDDIR)/unittest-cpp-1.4 -lUnitTest++
 SED = sed
 MV = mv
 RM = rm
@@ -93,17 +92,17 @@ all: $(test)
 # yum packages required to build foLanguage.
 #
 requirements:
-	yum -y install mysql-devel gcc-c++ unzip
+	yum -y install mysql-devel gcc-c++ valgrind
 
 #
 # Build library
 #
-$(libpath): $(BUILDDIR)/UnitTest++/libUnitTest++.a $(objects)
+$(libpath): $(BUILDDIR)/unittest-cpp-1.4/libUnitTest++.a $(objects)
 	@echo
 	@echo Creating $(libpath) library...
 	@gcc -shared -Wl,-soname,libfolanguage.so -o $(libpath)  $(objects) -lc
 	@echo
-	ldconfig -n ./build
+	ldconfig -n $(BUILDDIR)
 
 #
 # Build unit test
@@ -111,7 +110,7 @@ $(libpath): $(BUILDDIR)/UnitTest++/libUnitTest++.a $(objects)
 $(test): $(libpath) $(test_objects)
 	@echo
 	@echo Linking $(test)...
-	@$(CXX) $(test_objects) -o $(test) -L./build -lfolanguage $(LDFLAGS)
+	@$(CXX) $(test_objects) -o $(test) -L$(BUILDDIR) -lfolanguage $(LDFLAGS)
 	@echo
 	echo Running unit tests...
 	@LD_LIBRARY_PATH=$(BUILDDIR):$LD_LIBRARY_PATH ./$(test)
@@ -131,22 +130,25 @@ build/%.o : src/test/%.cpp
 	@echo Compile $<
 	@$(call make-depend,$<,$@,$(subst .o,.d,$@))
 	@$(CXX) $(CXXFLAGS) -c $< -o $(patsubst src/test/%.cpp, build/%.o, $<)
+
 #
 # UnitTest++ - A library used to create unit tests.
+# https://github.com/unittest-cpp
 #
-$(BUILDDIR)/UnitTest++/libUnitTest++.a:
+#
+$(BUILDDIR)/unittest-cpp-1.4/libUnitTest++.a:
 	mkdir -p build
-	rm -rf $(BUILDDIR)/UnitTest++
-	curl -L -o $(BUILDDIR)unittest-cpp.zip http://downloads.sourceforge.net/sourceforge/unittest-cpp/unittest-cpp-1.4.zip
-	unzip -d $(BUILDDIR) $(BUILDDIR)/unittest-cpp.zip
-	rm -f $(BUILDDIR)/unittest-cpp.zip
-	make -C $(BUILDDIR)UnitTest++
+	rm -rf $(BUILDDIR)/unittest-cpp-1.4
+	curl -L -o $(BUILDDIR)unittest-cpp.tar.gz https://github.com/unittest-cpp/unittest-cpp/archive/v1.4.tar.gz
+	tar zxf $(BUILDDIR)/unittest-cpp.tar.gz --directory=$(BUILDDIR)
+	rm -f $(BUILDDIR)/unittest-cpp.tar.gz
+	make -C $(BUILDDIR)/unittest-cpp-1.4
 
 #
 # Delete all build files.
 #
 clean:
-	@rm -rf $(BUILDDIR)/UnitTest++
+	@rm -rf $(BUILDDIR)/unittest-cpp-1.4
 	-@$(RM) $(objects) $(test_objects) $(dependencies) $(test_dependencies) $(test) $(libpath) 2> /dev/null
 
 #
