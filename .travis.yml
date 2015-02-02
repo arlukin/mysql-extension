@@ -1,4 +1,7 @@
 language: cpp
 compiler:
   - gcc
+before_script:
+  - sudo apt-get autoremove
+  - sudo apt-get install -y valgrind
 script: make
